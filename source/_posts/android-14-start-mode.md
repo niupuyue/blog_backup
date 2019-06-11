@@ -3,7 +3,7 @@ title: 重拾android路(十四) 启动模式
 date: 2016-08-28 11:15:07
 tags:
   - android
-
+  - 启动模式
 ---
 
 # 任务栈
@@ -181,8 +181,6 @@ startActivity（intent）;
 ![图片23](/assets/startmode/startmode23.png)
 4. singleInstance，在singleTask的基础上，限制了此模式的Activity只能单独地位于一个任务栈中
 ![图片24](/assets/startmode/startmode24.png)
-
-<a href="https://github.com/xiaoniudadi/blog_demo_android/tree/master/StartMode_demo">代码实例</a>
 
 # 参考资料
 [activity四中启动模式](http://blog.csdn.net/CodeEmperor/article/details/50481726)

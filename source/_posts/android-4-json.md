@@ -2,7 +2,8 @@
 title: 重拾Android路(四) json解析
 date: 2016-02-29 23:19:42
 tags:
-  - android
+  - json
+  - Gson
 ---
 
 数据解析在网络请求中是非常重要的，不管是发送数据到服务器，还是接受服务器传回来的数据，都是要用到json解析的。
@@ -248,8 +249,6 @@ public class JsonTool {
   }
 }
 ```
-
-<a href="https://github.com/xiaoniudadi/blog_demo_android/tree/master/Json_demo">代码实例</a>
 
 # 参考资料
 [基于java的json解析](http://www.jb51.net/article/101610.htm)

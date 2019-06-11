@@ -2,13 +2,16 @@
 title: 重拾Android路(五) RxJava和RxAndroid
 date: 2016-03-23 16:57:14
 tags:
-  - android
+  - Android
+  - rejava
 ---
 
 现在RxJava和RxAndroid越来越火爆，自己在业余时间也学习了一下，感觉确实很好用，之前 为了完成页面刷新，数据请求，组件信息传递的时候，要使用handler，真的是逻辑思路很强，稍微不注意，就各种错误一大堆。这下有了RxJava和RxAndroid，真的爽。
-<!--more-->
+
 # RxJava
 网上有很多给RxJava做定义的，很多人说的比较官方，而我是比较笨的那种人，所以看了很久也没有看懂，不过最后在一个博客中，看到
+
+<!--more-->
 
 > RxJava就是异步
 
@@ -1543,8 +1546,6 @@ public class RxJava_Douban extends Activity {
 ```
 
 暂时先写这么多，后面关于别的内容，以后再补充
-
-<a href="https://github.com/xiaoniudadi/blog_demo_android/tree/master/RxAndroid_demo">代码实例</a>
 
 # 参考资料
 [轻易&易懂的RxJava入门](https://www.jianshu.com/p/a406b94f3188)

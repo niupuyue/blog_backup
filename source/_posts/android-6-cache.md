@@ -2,7 +2,7 @@
 title: 重拾android路(六) 缓存
 date: 2016-04-15 23:23:34
 tags:
-  - android
+  - 缓存
 ---
 
 # LruCache
@@ -489,8 +489,6 @@ try {
 
 # 关于缓存的框架
 我们的换粗大部分情况下都是缓存图片，所以在一些图片请求框架中就已经包含了图片缓存，这个我以后在总结，留下个尾巴
-
-<a href="https://github.com/xiaoniudadi/blog_demo_android/tree/master/Cache_demo">代码实例</a>
 
 # 参考资料
 [android缓存](http://blog.csdn.net/shakespeare001/article/details/51695358)

@@ -2,7 +2,8 @@
 title: nodejs之Express
 date: 2018-01-28 19:13:28
 tags:
-  - web
+  - nodejs
+  - express
 ---
 
 > 项目介绍：基于nodejs+mysql+express+jade的招聘信息类网站构建

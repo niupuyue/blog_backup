@@ -3,6 +3,7 @@ title: 重拾android路(十五) broadcastReceiver
 date: 2016-09-15 14:26:36
 tags:
   - android
+  - braodcast
 ---
 
 > BroadcastReceiver 广播接受者用于接受系统或者其他应用程序发送的广播

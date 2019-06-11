@@ -2,7 +2,7 @@
 title: 重拾android路(八) UI
 date: 2016-05-15 23:24:36
 tags:
-  - android
+  - UI
 ---
 
 Android中的UI是非常重要的方面，直接关系到用户体验，所以我打算把之前用到的，比较好的UI拿出来复习一下。
@@ -946,8 +946,6 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sa
     }
 ```
 暂时先写这么多，后面的内容，以后补充···
-
-<a href="https://github.com/xiaoniudadi/blog_demo_android/tree/master/UIDesgin_demo">代码实例</a>
 
 # 参考资料
 [android O 通知渠道](https://www.jianshu.com/p/92afa56aee05)
