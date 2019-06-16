@@ -74,13 +74,16 @@ public class App extends Application {
 }
 ```
 其中
-```UMENG_APPKEY```，```UMENG_APPSECRET```是我们在注册账号时Umeng官方为我们的应用分配的，直接使用即可。
-```UMENG_CHANNEL```是渠道名称。
-```UMConfigure.DEVICE_TYPE_PHONE```表示的是设配类型是手机，除此之外还有```UMConfigure.DEVICE_TYPE_BOX```表示设备类型是盒子。
+
+UMENG_APPKEY，UMENG_APPSECRET是我们在注册账号时Umeng官方为我们的应用分配的，直接使用即可。
+
+UMENG_CHANNEL是渠道名称。
+
+UMConfigure.DEVICE_TYPE_PHONE表示的是设配类型是手机，除此之外还有UMConfigure.DEVICE_TYPE_BOX表示设备类型是盒子。
 
 在执行初始化之后，我们的基本操作完成了，但是为了后面能够更好的使用推送，我们需要执行下面更多的操作。
 ### 注册
-我们需要通过Umeng向Umeng官方注册，其实也就是告诉Umeng控制台，这里我们是有一个手机设备需要接受推送消息的。并且在注册成功之后，获取注册的```DeviceToken```。
+我们需要通过Umeng向Umeng官方注册，其实也就是告诉Umeng控制台，这里我们是有一个手机设备需要接受推送消息的。并且在注册成功之后，获取注册的DeviceToken。
 ```
 public class App extends Application {
 
@@ -110,8 +113,7 @@ public class App extends Application {
     }
 }
 ```
-这里注册成功之后，一般会想我们自己的后台发送一个```
-deviceToken```，这样方便以后发送推送消息是由后台控制的。例如给某个特定用的用户推送消息。
+这里注册成功之后，一般会想我们自己的后台发送一个deviceToken，这样方便以后发送推送消息是由后台控制的。例如给某个特定用的用户推送消息。
 
 之后还有一个操作，就是帮助Umeng后台统计日活情况的主要依据，一定要加上。Activity中所有的都要添加，建议直接在BaseActivity中的oncreate方法中实现。
 ```
@@ -124,10 +126,10 @@ PushAgent.getInstance(context).onAppStart();
 Umeng推送高级功能实现了自定义通知栏，自定义显示通知的动作等，这里的高级功能只适应于Android4.0以上版本，除此之后，可能由于不同的手机会出现不同的效果，如ROM定制型较强的小米，华为手机，部分效果无法显示。这里官方也提供了一个[demo](https://github.com/umeng/MultiFunctionAndroidDemo.git)。
 
 ### 自定义图标和自定义标题栏声音
-在```drawable```目录下放置两张图片，分别命名为```umeng_push_notification_default_large_icon```和```umeng_push_notification_default_small_icon```，那么在Umeng推送中，就会使用提供的图标，如果没有，则使用应用默认图标。
+在drawable目录下放置两张图片，分别命名为umeng_push_notification_default_large_icon和umeng_push_notification_default_small_icon，那么在Umeng推送中，就会使用提供的图标，如果没有，则使用应用默认图标。
 > 小米手机暂时无法使用自定义图标
 
-在```res/raw/```目录下添加资源文件，并且命名为```umeng_push_notification_default_sound```。如果没有，则使用系统的通知声音。
+在res/raw目录下添加资源文件，并且命名为umeng_push_notification_default_sound。如果没有，则使用系统的通知声音。
 > 若需要在线配置声音，则需先将与配置的声音文件放置在res/raw下，然后自发送后台指定声音的id，即R.raw.[sound]里的sound；
 
 > 自定义通知栏声音仅在Android 8.0以下机型生效，如需适配Android 8.0及以上版本，请参考自定义通知栏样式，重写getNotification方法，设置声音。
@@ -140,7 +142,7 @@ mPushAgent.setNotificaitonOnForeground(false);
 > 这个设置只能在执行完注册(regist)方法之后，才能调用
 
 ### 自定义通知栏样式
-```UmengMessageHandler```类负责处理消息，包括通知和自定义消息。我们可以通过```getNotification```函数设置不同的通知栏样式。
+UmengMessageHandler类负责处理消息，包括通知和自定义消息。我们可以通过getNotification函数设置不同的通知栏样式。
 ```
 protected void initPush() {
         UMConfigure.init(this, UMENG_APPKEY, UMENG_APPCHANNEL, UMConfigure.DEVICE_TYPE_PHONE, UMENG_APPSECRET);
@@ -201,8 +203,9 @@ protected void initPush() {
 在测试时，发送的消息需要在下面的截图中添加相应的类型：
 
 ![自定义通知栏样式](/assets/push/push01.png)
+
 ### 自定义通知栏打开动作
-我们通过解析UMessage中custome字段的内容，可以实现自定义通知栏打开动作。当我们需要执行自定义动作时，需要重写```dealWithCustomAction```方法。在自定义动作的时候，一般是通过传递不同的数据，来实现动态判断执行哪种动作的。
+我们通过解析UMessage中custome字段的内容，可以实现自定义通知栏打开动作。当我们需要执行自定义动作时，需要重写dealWithCustomAction方法。在自定义动作的时候，一般是通过传递不同的数据，来实现动态判断执行哪种动作的。
 在传递数据时，通过如下的内容实现：
 ![自定义通知栏打开动作](/assets/push/push02.png)
 这里我们传递了三个参数，分别是type，url，innerUrl。那么我们就通过type类型来判断跳转不同的页面，然后在通过url，判断跳转的子页面，通过innerUrl来判断跳转到H5页面。
@@ -297,13 +300,13 @@ protected void initPush() {
     }
  ```
 
-> 其实在```UmengNotificationClickHandler```中，除了上面的方法之外，还有别的方法可以完成通知栏的点击操作，如```launchApp```，```openUrl```，```openActivity```，```dealWithCustomAction```等，这几个方法代表了点击通知栏之后不同的操作，但是都会传递UMessage对象，所以所能执行到的效果类似，就不一一演示了。
+> 其实在UmengNotificationClickHandler中，除了上面的方法之外，还有别的方法可以完成通知栏的点击操作，如launchApp，openUrl，openActivity，dealWithCustomAction等，这几个方法代表了点击通知栏之后不同的操作，但是都会传递UMessage对象，所以所能执行到的效果类似，就不一一演示了。
 
 ### 自定义消息(透传消息)
 透传消息不是通知，也就不会在通知栏上显示，友盟会将透传消息传递给SDK，之后透传消息需要展示的样式和执行的操作，完全由代码决定。
 ![透传消息](/assets/push/push03.png)
 自定义消息可以用于应用内部或者特殊的逻辑。如我们需要推送的内容不是在通知栏显示，而是以一个弹窗的样式展示，则可以通过自定义消息。
-想要实现对自定义消息的处理，需要在```UmengMessageHandler```中重写```dealWithCustomMessage```方法。这个方法就是当发送自定义消息时，由SDK触发的。透传消息的自定义内容是放在UMessage对象中的custome参数中的，返回的数据是一个String类型，通过解析String内容，获取自定义消息。
+想要实现对自定义消息的处理，需要在UmengMessageHandler中重写dealWithCustomMessage方法。这个方法就是当发送自定义消息时，由SDK触发的。透传消息的自定义内容是放在UMessage对象中的custome参数中的，返回的数据是一个String类型，通过解析String内容，获取自定义消息。
 ```
 protected void initPush() {
         UMConfigure.init(this, UMENG_APPKEY, UMENG_APPCHANNEL, UMConfigure.DEVICE_TYPE_PHONE, UMENG_APPSECRET);
@@ -423,7 +426,7 @@ protected void initPush() {
 ### 标签&别名
 我们可以这样理解，如果我们想给一群特定的人推送消息，这一群人可以是会员，或者被系统拉黑的用户等等，而其他的用户是接收不到这个推送消息的。为了简化这样的流程，引入了标签的概念。
 别名是我们可一个特定的某一个用户推送消息。例如一个用户的好友将他删除了，我们可以通过发送推送，告诉被删除者，你的好友将你删除了。
-在代码中，我们通过```addTags```和```addAlias```来实现添加标签和别名。
+在代码中，我们通过addTags和addAlias来实现添加标签和别名。
 标签：
 ```
 //添加标签，将tag1,tag2添加到当前设备中，一般情况下，我们会有一些判断，然后再为不同的用户添加不同的tag
@@ -485,10 +488,10 @@ InAppMessageManager.getInstance(this).showCardMessage(this, this.getClass().getS
 > InAppMessageManager.getInstance(Context context).showCardMessage(Activity activity, String label, IUmengInAppMsgCloseCallback callback);
 > 注意
 > 1. label ：表示当前插屏消息的标识
-> 2. 客户端先调用```showCardMessage```，将label发送给服务端，之后U-Push后台展示位置才会出现可选label
+> 2. 客户端先调用showCardMessage，将label发送给服务端，之后U-Push后台展示位置才会出现可选label
 > 3. 插屏消息的图片会执行缓存，但有新消息来时，旧消息的缓存会被删除
 
-同时我们可以自定义插屏消息的样式，需要在添加布局文件```umeng_custom_card_message.xml```。使用的模板如下，里面除了一个ImageView和两个button不能改变之外，其他的均可以改变
+同时我们可以自定义插屏消息的样式，需要在添加布局文件umeng_custom_card_message.xml。使用的模板如下，里面除了一个ImageView和两个button不能改变之外，其他的均可以改变
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -620,7 +623,7 @@ mPushAgent.enable(new IUmengCallback() {
             android:name="UMENG_MESSAGE_SECRET"
             android:value="xxxxxxxxxxxxxxxxxxxxxx" />
 ```
-在新版本中，就算在Manifest文件中设置了AppKey等信息，同样要执行```UMConfigure.init()```方法。
+在新版本中，就算在Manifest文件中设置了AppKey等信息，同样要执行UMConfigure.init方法。
 
 # 小米
 
@@ -674,9 +677,12 @@ mPushAgent.enable(new IUmengCallback() {
     <uses-permission android:name="android.permission.VIBRATE" />
 ```
 > 注意：
-> 这里需要做一些修改，需要将```<permission
+> 这里需要做一些修改，需要将
+```<permission
         android:name="com.paulniu.mypush.permission.MIPUSH_RECEIVE"
-        android:protectionLevel="signature" />```中的包名改成自己的包名，需要将```<uses-permission android:name="com.paulniu.mypush.permission.MIPUSH_RECEIVE" />```改成自己的包名
+        android:protectionLevel="signature" />
+```
+中的包名改成自己的包名，需要将uses-permission android:name="com.paulniu.mypush.permission.MIPUSH_RECEIVE" />改成自己的包名
 2. 添加小米推送系统广播接收器和服务
 ```
 <!--小米推送开始-->
@@ -720,7 +726,7 @@ mPushAgent.enable(new IUmengCallback() {
         <!--小米推送结束-->
 ```
 这部分内容是固定的，直接复制使用即可
-3. 创建一个新的类```IMiPushMessageReceiver```，并且让这个类集成PushMessageReceiver，小米推送注册，推送接收，推送点击都是在这个接收器中实现，接收器在Manifest文件中声明如下：
+3. 创建一个新的类IMiPushMessageReceiver，并且让这个类集成PushMessageReceiver，小米推送注册，推送接收，推送点击都是在这个接收器中实现，接收器在Manifest文件中声明如下：
 ```
         <!--自定义MessageReceiver-->
         <receiver
@@ -885,22 +891,22 @@ if(android.os.Build.BRAND.toLowerCase().contains("oppo")){
             </intent-filter>
         </activity>
 ```
-> 其中的```<action android:name="com.paulniu.mypush.oppopush" />```是当我们发送应用内页时的标识
+> 其中的action android:name="com.paulniu.mypush.oppopush" />是当我们发送应用内页时的标识
 
 如图所示：
 ![在这里插入图片描述](/assets/push/push06.png)
-> 2019年2月15日15:10:13 OPPO官网对这个地方的样式做了调整
-> 1.如果传递的是Intent Action ，如图 
-> ![在这里插入图片描述](/assets/push/push07.png)
-> 则在使用的时候需要在Manifest文件中设置如图
-> ![在这里插入图片描述](/assets/push/push08.png)
-> 2.如果使用的是Activity，如图
-> ![在这里插入图片描述](/assets/push/push09.png)
-> 这个就不多说了
-> 3.如果使用的是Scheme,如图
-> ![在这里插入图片描述](/assets/push/push10.png)
-> 那么在Manifest文件中使用的应该是如下所示
-> 
+ 2019年2月15日15:10:13 OPPO官网对这个地方的样式做了调整
+ 1.如果传递的是Intent Action ，如图 
+![在这里插入图片描述](/assets/push/push07.png)
+则在使用的时候需要在Manifest文件中设置如图
+![在这里插入图片描述](/assets/push/push08.png)
+2.如果使用的是Activity，如图
+ ![在这里插入图片描述](/assets/push/push09.png)
+ 这个就不多说了
+ 3.如果使用的是Scheme,如图
+ ![在这里插入图片描述](/assets/push/push10.png)
+ 那么在Manifest文件中使用的应该是如下所示
+ 
 ![在这里插入图片描述](/assets/push/push11.png)
 
 

@@ -76,5 +76,37 @@ git fetch origin
 git reset --hard origin/master
 ```
 
+## 分支
+分支是用来将特性开发绝缘开来的。在你创建仓库的时候，master 是“默认的”分支。在其他分支上进行开发，完成后再将它们合并到主分支上。
+我们通常在开发新功能、修复一个紧急 bug 等等时候会选择创建分支。单分支开发好还是多分支开发好，还是要看具体场景来说
+
+创建一个名为dev的分支
+```
+git branch dev
+```
+切换当前分支到 test（当你切换分支的时候，Git 会重置你的工作目录，使其看起来像回到了你在那个分支上最后一次提交的样子。 Git 会自动添加、删除、修改文件以确保此时你的工作目录和这个分支最后一次提交时的样子一模一样）
+```
+git checkout dev
+```
+我们可以采用合并的写法
+```
+git checkout -b dev
+```
+常用的命令
+1. 切换到主分支
+```
+git checkout master
+```
+2. 合并分支
+```
+git merge master(当前分支是dev分支，将master分支上的内容合并到dev分支上)
+```
+3. 推送到远程服务器上
+```
+git push origin
+```
+
+
+
 # 参考资料
 [git入门](https://github.com/pengMaster/BestNote/blob/master/docs/tools/Git.md#git-%E4%BD%BF%E7%94%A8%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8)

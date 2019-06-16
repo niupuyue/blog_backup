@@ -1,5 +1,5 @@
 ---
-title: JavaEEčŞĺ­ŚäščˇŻ(ä¸) mysql
+title: JavaEE mysql
 date: 2016-12-07 20:37:03
 tags:
   - java
