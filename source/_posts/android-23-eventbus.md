@@ -1,5 +1,5 @@
 ---
-title: 重拾Android之路(十八) eventbus
+title: 重拾Android之路(二十二) eventbus
 date: 2018-04-12 20:24:39
 tags:
   - android
