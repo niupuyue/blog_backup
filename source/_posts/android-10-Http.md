@@ -281,3 +281,4 @@ Http协议定义了很多与服务器交互的方法，最基本的有4种，分
 # 参考资料
 [关于HTTP协议，一篇就够了](https://www.cnblogs.com/ranyonsue/p/5984001.html)
 [详解URL组成](https://blog.csdn.net/ergouge/article/details/8185219)
+[网络基础之HTTP协议](https://zhuanlan.zhihu.com/p/24913080)
