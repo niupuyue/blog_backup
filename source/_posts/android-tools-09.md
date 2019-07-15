@@ -1,6 +1,6 @@
 ---
 title: android奇技淫巧 09 gradle统一配置版本
-date: 2018-07-11 22:42:10
+date: 2019-07-11 22:42:10
 tags:
   - gradle配置
 ---
@@ -11,7 +11,9 @@ tags:
 
 在Project/build.gradle中定义，在module/build.gradle中使用
 最终的效果如图所示：
+
 ![gradle同一版本配置](/assets/tools/tools-gradle-01.png)
+
 我们可以单独配置一个config.gradle的文件，在这个文件中，将我们所有需要使用到的版本进行统一管理
 
 1. 在project层级下新建一个名为config.gradle的文件，这个文件就是我们需要配置版本的地方
@@ -59,12 +61,15 @@ ext {
 ```
 
 3. 在project层级下的build.gradle文件中将config.gradle引入到该文件中，如下所示
+
 ```
 apply from: 'config.gradle'
 ```
+
 ![将配置文件引入到build.gradle文件中](/assets/tools/tools-gradle-02.png)
 
 4. 引用
+
 在引用的时候分为两种，一种是系统配置，如minSdk，另外一种是依赖，比如我们引入rxJava
 
 - 数字引入
