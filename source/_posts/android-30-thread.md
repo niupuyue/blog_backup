@@ -137,12 +137,49 @@ Thread类和Runnable的两种方式的区别
 工作原理：[Android Handler：图文解析 Handler通信机制 的工作原理](https://www.jianshu.com/p/f0b23ee5a922)
 源码分析：[Android Handler：手把手带你深入分析 Handler机制源码](https://www.jianshu.com/p/b4d745c7ff7a)
 
+# 复合使用
+Android多线程实现的复合使用包括：
 
+AsyncTask
+HandlerThread
+IntentService
 
+称为”复用“的主要原因是：这3种方式的本质原理都是Android多线程基础实现（继承Thread类、实现Runnable接口、Handler）的组合实现
 
+## AsyncTask
 
+![AsyncTask](/assets/thread/thread11.png)
 
+具体使用 & 实例讲解：[Android 多线程：手把手教你使用AsyncTask](https://www.jianshu.com/p/ee1342fcf5e7)
 
+工作原理 & 源码分析：[Android 多线程：AsyncTask的原理 及其源码分析](https://www.jianshu.com/p/37502bbbb25a)
+
+## HandlerThread
+
+![HandlerThread](/assets/thread/thread12.png)
+
+具体使用 & 实例讲解：[Android多线程：手把手教你使用HandlerThread](https://www.jianshu.com/p/9c10beaa1c95)
+
+工作原理 & 源码分析：[Android多线程：这是一份详细的HandlerThread源码分析攻略](https://www.jianshu.com/p/4a8dc2f50ae6)
+
+## IntentService
+![IntentService](/assets/thread/thread13.png)
+
+具体使用 & 实例讲解：[Android多线程：IntentService使用教程（含实例讲解）](https://www.jianshu.com/p/af62781fefba)
+
+工作原理 & 源码分析：[Android多线程：这是一份全面 & 详细的IntentService源码分析指南](https://www.jianshu.com/p/8a3c44a9173a)
+
+# 高级实用
+
+Android多线程的高级使用主要是线程池（ThreadPool）。
+
+![ThreadPool](/assets/thread/thread14.png)
+
+![使用](https://www.jianshu.com/p/0e4a5e70bf0e)
+
+# 对比
+
+![对比](/assets/thread/thread15.png)
 
 # 参考资料
 [android多线程编程指南](https://juejin.im/post/5d12c1c66fb9a07ee30e2821)
