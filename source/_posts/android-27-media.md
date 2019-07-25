@@ -2,6 +2,7 @@
 title: 重拾android路(二十六) Android多媒体
 date: 2018-4-08 11:27:11
 tags:
+  - android
   - record
   - video
 ---

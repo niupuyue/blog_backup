@@ -3,7 +3,6 @@ title: 重拾android路(九) 自定义View
 date: 2016-05-30 23:25:45
 tags:
   - android
-  - 自定义view
 ---
 
 

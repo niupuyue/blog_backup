@@ -3,6 +3,7 @@ title: 重拾android路(二十) gradle
 date: 2018-2-27 11:27:11
 tags:
   - gradle
+  - android 
 ---
 # 概念
 Gradle是帮助我们管理Android项目的工具，可以帮我们实现快速引入依赖库，编译方式，多渠道打包等工作。一开始在开发Android项目中使用的是eclipse，其中引入依赖库时，需要从网上下载下来，然后再导入到项目中，过程非常繁琐。不过在使用了Gradle之后，我就感觉我可能离不开这个玩意儿了。

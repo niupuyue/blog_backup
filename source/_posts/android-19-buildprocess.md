@@ -2,7 +2,7 @@
 title: 重拾android路(十八) Android构建流程
 date: 2018-2-10 11:27:11
 tags:
-  - 构建
+  - android
 ---
 
 

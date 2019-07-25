@@ -3,7 +3,6 @@ title: 重拾android路(十四) 启动模式
 date: 2016-08-28 11:15:07
 tags:
   - android
-  - 启动模式
 ---
 
 # 任务栈

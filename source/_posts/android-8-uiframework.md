@@ -2,7 +2,7 @@
 title: 重拾android路(八) UI
 date: 2016-05-15 23:24:36
 tags:
-  - UI
+  - android
 ---
 
 Android中的UI是非常重要的方面，直接关系到用户体验，所以我打算把之前用到的，比较好的UI拿出来复习一下。

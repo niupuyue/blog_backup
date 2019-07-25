@@ -2,7 +2,8 @@
 title: 重拾android路(六) 缓存
 date: 2016-04-15 23:23:34
 tags:
-  - 缓存
+  - android
+  - cache
 ---
 
 # LruCache

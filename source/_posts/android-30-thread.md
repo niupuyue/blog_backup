@@ -2,7 +2,8 @@
 title: 重拾android路(三十) Android多线程
 date: 2019-07-19 15:27:11
 tags:
-  - 多线程
+  - android
+  - thread
 ---
 多线程的应用在Android开发中是非常常见的，常用方法主要有
 <!--more-->
