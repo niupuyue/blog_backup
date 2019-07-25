@@ -2,7 +2,7 @@
 title: android奇技淫巧 07 Android APK体积优化
 date: 2019-07-04 21:44:10
 tags:
-  - APK体积优化
+  - android
 ---
 
 一般APK体积优化可以从以下几个方面入手

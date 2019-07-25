@@ -2,7 +2,7 @@
 title: android奇技淫巧 05 Android targetSdkVersion 升级到 26 总结
 date: 2019-07-01 22:44:10
 tags:
-  - android target sdk
+  - android
 ---
 
 由于各个应用市场要求，需要在 2019年5月1日 之前把 target 升级到 26。所以对本公司全网的 App 和可能影响到的相关 SDK 做一个升级。本文主要记录此次升级的过程和解决的一些问题。

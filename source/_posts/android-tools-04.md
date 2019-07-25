@@ -2,7 +2,7 @@
 title: android奇技淫巧 04 超简单实现Android自定义Toast
 date: 2019-07-01 20:44:10
 tags:
-  - Toast
+  - android
 ---
 
 Bamboy的自定义Toast，（

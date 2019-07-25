@@ -2,7 +2,7 @@
 title: android奇技淫巧 10 SoftInputMode属性介绍
 date: 2019-07-12 22:42:10
 tags:
-  - SoftInputMode
+  -android
 ---
 
 android软键盘属性SoftInputMode属性设置介绍

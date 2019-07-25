@@ -2,7 +2,7 @@
 title: android奇技淫巧 02 无限循环RecyclerView
 date: 2019-06-12 22:40:20
 tags:
-  - RecyclerView
+  - android
 ---
 
 项目中要实现横向列表的无限循环滚动，自然而然想到了RecyclerView，但我们常用的RecyclerView是不支持无限循环滚动的，所以就需要一些办法让它能够无限循环

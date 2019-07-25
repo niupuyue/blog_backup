@@ -18,7 +18,7 @@ tags:
 
 例如：
 1. 我们可以在Interget类型中存放字符串，boolean值等等各种各样的数据，但是有一中情况是例外的，就是如果一个
-   字段被<font color='red'>INTEGER PRIMARY KEY</font>修饰的时候，只能存储64位整数。
+   字段被<pre>INTEGER PRIMARY KEY</pre>修饰的时候，只能存储64位整数。
 2. 当sqlite解析数据库语句的时候，会自动忽略 CREATE TABLE 语句中跟在字段名后面的数据类型信息
 3. sqlite可以解析大部分的sql语句
 > select * from 表名 where 条件子句 group by 分组字句 having ... order by 排序子句 (顺序一定不能错)

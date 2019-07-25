@@ -2,8 +2,7 @@
 title: android奇技淫巧 01 Coordinatorlayout+appbarLayout
 date: 2019-06-12 22:40:20
 tags:
-  - Coordinatorlayout
-  - appbarlayout
+  - android
 ---
 
 现在好多的App中都会有折叠式布局，给用户提供了很好的体验，其实就是通过Coordinatorlayout + AppbarLayout + CollapsingToolbarLayout三个部分组成的。以前自己学习这个技巧的时候，都是拿来主义，能用就好，对于其中的具体内容并不是非常关心，因为毕竟大部分时间还是要出效果，至于原理，项目是不会在乎的。但是别人不在乎，我们不能不在乎，学到的就是自己的。
