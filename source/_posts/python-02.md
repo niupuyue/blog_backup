@@ -1,5 +1,5 @@
 ---
-title: 拥抱Python（二） 基本语法
+title: 拥抱Python（二） 基本语法概述
 date: 2019-07-25 22:23:10
 tags:
   - Python
