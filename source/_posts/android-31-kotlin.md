@@ -35,6 +35,7 @@ kotlin源文件不需要相匹配的目录和包，源文件可以放在任何�
 
 ## 默认导入
 有几个包会默认导入到每个kotlin文件中，如下
+
 ```
 kotlin.*
 kotlin.annotation.*
