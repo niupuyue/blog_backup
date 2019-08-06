@@ -12,9 +12,6 @@ tags:
 
 从5.0开始（API Level 21），可以完全控制安卓设备相机的新api Camera2(android.hardware.Camera2)被引入了进来。在以前的Camera api(android.hardware.Camera)中，对相机的手动控制需要更改系统才能实现，而且api也不友好。不过老的Camera API在5.0上已经过时，如今Android推荐使用Camera2采集视频，借着写这篇记录的过程，熟悉和理解Camera2流程。
 
-
-
-
 # SurfaceView
 
 完整代码
@@ -515,7 +512,7 @@ public class TextureViewActivity extends AppCompatActivity implements View.OnCli
 }
 ```
 
-![demo代码](https://github.com/xiaoniudadi/android-media-demo/tree/master/03-android-media-camera-video)
+[demo代码](https://github.com/xiaoniudadi/android-media-demo/tree/master/03-android-media-camera-video)
 
 # 参考博客
 [Camera2 API 采集视频并SurfaceView、TextureView 预览](https://www.jianshu.com/p/e01c11b96829)

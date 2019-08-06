@@ -1,6 +1,6 @@
 ---
 title: android 音视频开发(三)
-date: 2019-08-02 21:51:10
+date: 2019-08-04 21:51:10
 tags:
   - android
   - 音视频
@@ -513,5 +513,5 @@ public class IMediaRecorder {
 [demo代码](https://github.com/xiaoniudadi/android-media-demo/tree/master/02-android-media-audio-collection)
 
 # 参考博客
-![AudioRecord 录音详解](https://blog.csdn.net/pangpang123654/article/details/82657795)
+[AudioRecord 录音详解](https://blog.csdn.net/pangpang123654/article/details/82657795)
 
