@@ -512,9 +512,6 @@ public class IMediaRecorder {
 
 [demo代码](https://github.com/xiaoniudadi/android-media-demo/tree/master/02-android-media-audio-collection)
 
-
-
-
 # 参考博客
 ![AudioRecord 录音详解](https://blog.csdn.net/pangpang123654/article/details/82657795)
 
