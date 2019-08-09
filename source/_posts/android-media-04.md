@@ -12,6 +12,39 @@ tags:
 
 从5.0开始（API Level 21），可以完全控制安卓设备相机的新api Camera2(android.hardware.Camera2)被引入了进来。在以前的Camera api(android.hardware.Camera)中，对相机的手动控制需要更改系统才能实现，而且api也不友好。不过老的Camera API在5.0上已经过时，如今Android推荐使用Camera2采集视频，借着写这篇记录的过程，熟悉和理解Camera2流程。
 
+## 一些名词
+
+### YVU
+颜色编码的方法，在旧Camera API 常用的是NV21和YV12，可以转成RGB编码
+```
+// 获取Camera2支持的颜色编码
+StreamConfigurationMap map characteristics.get(CameraCharacteristics,SCALER_STREAM_CONFIGURATION_MAP);
+map.getOutputFormats();
+```
+
+### CameraManager
+Camera2中负责管理，查询摄像头信息，打开可用摄像头的管理对象
+1. cameraId  通过getCameraidList()枚举获得，代表使用哪个摄像头
+2. 设备信息通过CameraCharateristic.getCameraCharacteristics(cameraId)获取到
+3. 打开摄像头 openCamera(String cameraId,CameraManager.StateCallback callback,Handler handler),其中StateCallback是接收设备状态的更新回调，例如CameraDevice就是通过StateCallback中的onOpen()回调中拿到，handler表示打开摄像头具体操作在哪个Handler的Looper中，也就是在哪个线程中执行，设置为null，表示在当前线程
+
+### CameraDevice
+具体的摄像头，提供一组属性信息，描述硬件设备以及设备的可用设置和参数
+1. CamearDevice是在CameraManager打开摄像头后，通过CameraDevice.StateCallback的回调中拿到的，是一个异步过程
+2. createCaptureRequest()创建CaptureRequest.Builder,CaptureRequest.Builder负责创建各种捕获图像的请求CaptureRequest
+3. createCaptureSession() 负责创建捕获对象会话CameraCaptureSession
+
+### CaptureRequest
+一次捕获请求，通过CaptureRequest.Builder的build()方法创建，其实请求参数也是通过Builder来设置：CaptureRequest.Builder常用的方法：
+1. addTarget(Surface outputTarget) 将Surface添加到输出列表中，才可以显示在SurfaceView，TextureView或者输出到ImageReader中
+2. set(Key<T> key,T value) 设置其他属性
+
+### CameraCaptureSession
+捕获的会话Session，预览，拍照，都由该对象进行控制
+1. CameraCaptureSession是通过CameraDevice的createCaptureSession(List<Surface>,CameraCaptureSessionStateCallback,handler)创建
+2. 拍照 capture(CaptureRequest,CameraCaptureSession.CaptureCallback,hanlder)
+3. 预览 setRepeatingRequest(CaptureRequest,CameraCaptureSession.CaptureCallback,handler)
+
 # SurfaceView
 
 完整代码
