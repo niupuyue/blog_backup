@@ -24,6 +24,38 @@ tags:
 6. 有了这个byteBuffer数据，之后的是直接交给MediaMuxer执行操作这一帧，之后调用adVance()获取下一帧，重复第5,6步的操作
 7. 操作完成之后释放release()
 
+### 主要的API介绍
+1. setDataSource(String path)  可以设置本地文件又可以设置为网络文件
+2. getTrackCount()             得到源文件的通道数
+3. getTrackFormat(int index)   获取指定(index)的通道格式
+4. getSampleTime()             返回当前的时间戳
+5. readSampleData(ByteBuffer byteBuf,int offset)    把指定通道中的数据偏移量读取到ByteBuffer中
+6. advance()                   读取下一帧数据
+7. release()                   读取结束后释放资源
+
+```
+MediaExtractor extractor = new MediaExtractor();
+ extractor.setDataSource(...);
+ int numTracks = extractor.getTrackCount();
+ for (int i = 0; i < numTracks; ++i) {
+   MediaFormat format = extractor.getTrackFormat(i);
+   String mime = format.getString(MediaFormat.KEY_MIME);
+   if (weAreInterestedInThisTrack) {
+     extractor.selectTrack(i);
+   }
+ }
+ ByteBuffer inputBuffer = ByteBuffer.allocate(...)
+ while (extractor.readSampleData(inputBuffer, ...) >= 0) {
+   int trackIndex = extractor.getSampleTrackIndex();
+   long presentationTimeUs = extractor.getSampleTime();
+   ...
+   extractor.advance();
+ }
+
+ extractor.release();
+ extractor = null;
+```
+
 # MediaMuxer API
 
 作用：生成一个音频或者视频文件，还可以吧音频和视频混合成一个音视频文件
@@ -35,3 +67,128 @@ tags:
 3. start():开始合成文件
 4. 每当MediaExtracktor的第5步之后，用writeSampleData(int trackIndex,ByteBuffer byteBuf,MediaCodec.BufferInfo bufferInfo):把ByteBuffer中的数据写入之前设置的文件中
 5. 数据写入完成，stop():停止合成文件  release()释放资源
+
+### 主要API介绍
+
+1. MediaMuxer(String path, int format)：path:输出文件的名称  format:输出文件的格式；当前只支持MP4格式；
+2. addTrack(MediaFormat format)：添加通道；我们更多的是使用MediaCodec.getOutpurForma()或Extractor.getTrackFormat(int index)来获取MediaFormat;也可以自己创建；
+3. start()：开始合成文件
+4. writeSampleData(int trackIndex, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo)：把ByteBuffer中的数据写入到在构造器设置的文件中；
+5. stop()：停止合成文件
+6. release()：释放资源
+
+```
+MediaMuxer muxer = new MediaMuxer("temp.mp4", OutputFormat.MUXER_OUTPUT_MPEG_4);
+ // More often, the MediaFormat will be retrieved from MediaCodec.getOutputFormat()
+ // or MediaExtractor.getTrackFormat().
+ MediaFormat audioFormat = new MediaFormat(...);
+ MediaFormat videoFormat = new MediaFormat(...);
+ int audioTrackIndex = muxer.addTrack(audioFormat);
+ int videoTrackIndex = muxer.addTrack(videoFormat);
+ ByteBuffer inputBuffer = ByteBuffer.allocate(bufferSize);
+ boolean finished = false;
+ BufferInfo bufferInfo = new BufferInfo();
+
+ muxer.start();
+ while(!finished) {
+   // getInputBuffer() will fill the inputBuffer with one frame of encoded
+   // sample from either MediaCodec or MediaExtractor, set isAudioSample to
+   // true when the sample is audio data, set up all the fields of bufferInfo,
+   // and return true if there are no more samples.
+   finished = getInputBuffer(inputBuffer, isAudioSample, bufferInfo);
+   if (!finished) {
+     int currentTrackIndex = isAudioSample ? audioTrackIndex : videoTrackIndex;
+     muxer.writeSampleData(currentTrackIndex, inputBuffer, bufferInfo);
+   }
+ };
+ muxer.stop();
+ muxer.release();
+```
+
+# 使用场景
+从MP4文件中提取视频，并生成新的视频文件
+
+```
+public class MainActivity extends AppCompatActivity {
+
+    private static final String SDCARD_PATH = Environment.getExternalStorageDirectory().getPath();
+
+    private MediaExtractor mMediaExtractor;
+    private MediaMuxer mMediaMuxer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // 获取权限
+        int checkWriteExternalPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int checkReadExternalPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);if (checkWriteExternalPermission != PackageManager.PERMISSION_GRANTED ||
+                checkReadExternalPermission != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+        }
+
+        setContentView(R.layout.activity_main);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    process();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private boolean process() throws IOException {
+        mMediaExtractor = new MediaExtractor();
+        mMediaExtractor.setDataSource(SDCARD_PATH + "/ss.mp4");
+
+        int mVideoTrackIndex = -1;
+        int framerate = 0;
+        for (int i = 0; i < mMediaExtractor.getTrackCount(); i++) {
+            MediaFormat format = mMediaExtractor.getTrackFormat(i);
+            String mime = format.getString(MediaFormat.KEY_MIME);
+            if (!mime.startsWith("video/")) {
+                continue;
+            }
+            framerate = format.getInteger(MediaFormat.KEY_FRAME_RATE);
+            mMediaExtractor.selectTrack(i);
+            mMediaMuxer = new MediaMuxer(SDCARD_PATH + "/ouput.mp4", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+            mVideoTrackIndex = mMediaMuxer.addTrack(format);
+            mMediaMuxer.start();
+        }
+
+        if (mMediaMuxer == null) {
+            return false;
+        }
+
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        info.presentationTimeUs = 0;
+        ByteBuffer buffer = ByteBuffer.allocate(500 * 1024);
+        int sampleSize = 0;
+        while ((sampleSize = mMediaExtractor.readSampleData(buffer, 0)) > 0) {
+
+            info.offset = 0;
+            info.size = sampleSize;
+            info.flags = MediaCodec.BUFFER_FLAG_SYNC_FRAME;
+            info.presentationTimeUs += 1000 * 1000 / framerate;
+            mMediaMuxer.writeSampleData(mVideoTrackIndex, buffer, info);
+            mMediaExtractor.advance();
+        }
+
+        mMediaExtractor.release();
+
+        mMediaMuxer.stop();
+        mMediaMuxer.release();
+
+        return true;
+    }
+}
+```
+
+# 参考资料
+[Android 音视频开发(五)：使用 MediaExtractor 和 MediaMuxer API 解析和封装 mp4 文件](https://www.cnblogs.com/renhui/p/7474096.html)
