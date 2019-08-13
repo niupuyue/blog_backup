@@ -49,7 +49,7 @@ Android应用程序在运行的过程中需要向手机上保存数据，一般�
 
 |      方法调用      |      路径位置      |
 |:------             |:---               |
-|context.getFilesDir()   |  外部存储data/data/包名/files目录  |
+| context.getFilesDir()   |  外部存储data/data/包名/files目录  |
 | context.getCacheDir()   |   外部存储设备data/data/包名/cache目录   |
 | context.getExternalStorageDirectory()   | 外部存储设备的根目录   |
 | context.getExternalStoragePublicDirectory  | 外部存储设备公有目录 (Environment.DIRECTORY_DCIM)  |
