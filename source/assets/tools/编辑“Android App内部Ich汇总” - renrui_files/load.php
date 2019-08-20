@@ -1,0 +1,2 @@
+form#editform{margin:0;padding:0}#wpTextbox1{line-height:1.5em;resize:vertical}.wikiEditor-oldToolbar,.wikiEditor-ui-toolbar{display:none}
+/* cache key: my_wiki:resourceloader:filter:minify-css:7:ab36195e84a4ca5b9e7e7fdd1f4d6c99 */
