@@ -7,6 +7,8 @@ tags:
 
 在Android开发中我们经常会听到这几个概念，内存，外部存储，内部存储，很多时候我们常常把这个概念弄混淆，所以这篇博客就在这里做一下总结
 
+<!--more-->
+
 内存(Menory),内部存储(InternalStorage),外部存储(ExternalStorage)，通过英文翻译很容易混淆
 我们可以对Android手机存储空间做以下划分
 1. 内存：RAM
