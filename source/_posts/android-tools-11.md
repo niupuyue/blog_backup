@@ -5,3 +5,5 @@ tags:
   - android
 ---
 
+# 参考博客
+[Activity启动流程](https://www.jianshu.com/p/89fd44083c1c)
