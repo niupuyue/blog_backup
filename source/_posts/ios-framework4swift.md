@@ -4,10 +4,11 @@ date: 2018-05-14 19:33:13
 tags:
   - ios
 ---
+<!--more-->
 # SnapKit
 SnapKit，一个经典的Swift版的第三方库，专门用于项目的自动布局，目前在github上的stars就高达9340颗星，这是一个不小的数字，亦足以证明它存在的非凡意义和作用。作者认为，在iOS开发（swift）中，它是用于项目最优秀的自动布局的必选库之一,它的作者仍然是写Objective-C的第三方库Masonry的大牛 - @Robert Payne.
 关于怎么安装就不说了，直接开搞
-<!--more-->
+
 1. 实现一个宽高为100，居于当前视图的中心的视图布局
 ```
 import UIKit

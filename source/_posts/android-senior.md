@@ -4,10 +4,8 @@ date: 2018-01-12 16:54:13
 tags:
  - Android
 ---
-
-![Android高级知识图解](/assets/android-senior/Androidsenior.png)
-
 <!--more-->
+![Android高级知识图解](/assets/android-senior/Androidsenior.png)
 
 # Android系统源码学习
 - Binder机制和AIDL

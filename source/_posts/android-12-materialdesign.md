@@ -4,11 +4,12 @@ date: 2016-07-20 23:29:10
 tags:
  - Android
 ---
+<!--more-->
 在Google I/O 2015大会中，Google为Android开发者介绍了Design Support Library。这个library可以让开发者很容易地实现更多Material Design概念到他们的应用中，因为很多关键元素是不可用的在原来的框架外。首先就是很易于使用，Design Support Library向下兼容到API 7。Design Support Library可以引入到你的Android工程中通过导入Gradle依赖.
 而在Google官网中的<a href='https://developer.android.com/reference/android/support/design/widget/package-summary.html'>android.support.design.widget</a>中，详细描述了这个几个组件(版本以24.1.0为准)
 注释
 
-<!--more-->
+
 
 | 注释名称 | 原文描述 |
 |---|---|

@@ -5,6 +5,7 @@ tags:
   - android
   - thread
 ---
+<!--more-->
 多线程的应用在Android开发中是非常常见的，常用方法主要有
 
 

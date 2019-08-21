@@ -4,7 +4,7 @@ date: 2018-05-16 09:15:30
 tags:
   - ios
 ---
-
+<!--more-->
 # 遍历某个文件夹的文件
 ## 获取当前路径
 ```
@@ -13,7 +13,7 @@ let urlForDocument = manager.urls(for: .documentDirectory, in:.userDomainMask)
 let url = urlForDocument[0] as URL
 print(url)
 ```
-<!--more-->
+
 结果：
 ![获取当前路径](/assets/ios_file/if_01.png)
 

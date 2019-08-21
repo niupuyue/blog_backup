@@ -5,10 +5,10 @@ tags:
   - android
   - cache
 ---
-
+<!--more-->
 # LruCache
 LruCache 位于 android.util 包下，属于 SDK 自动的工具类。Lru 的英文为 Least recently used，近期最少使用算法。设计的思路大致是这样的，在一个特定的缓存大小限制下，最近被使用的内容，很可能在未来再次被使用，而越长时间没被使用的内容，被使用的概率越底，基于这样的思路，最近被使用的内容被放在缓存的头部，这样减少了下次使用的查找时间，很长时间不被使用的内容被放在缓存的尾部，甚至在缓存超出预设的大小的时候，把尾部的内容从缓存中清楚掉
-<!--more-->
+
 ## 实现原理
 根据LRU算法的思想，要实现LRU最核心的是要有一种数据结构能够基于访问顺序来保存缓存中的对象，这样我们就能够很方便的知道哪个对象是最近访问的，哪个对象是最长时间未访问的。LruCache选择的是LinkedHashMap这个数据结构，LinkedHashMap是一个双向循环链表，在构造LinkedHashMap时，通过一个boolean值来指定LinkedHashMap中保存数据的方式，LinkedHashMap的一个构造方法如下：    
 ```

@@ -4,11 +4,11 @@ date: 2019-07-02 20:31:11
 tags:
   - flutter
 ---
-
+<!--more-->
 # 简介
 Flutter是谷歌的移动UI框架，可以快速在iOS和Android上构建高质量的原生用户界面。 Flutter可以与现有的代码一起工作。在全世界，Flutter正在被越来越多的开发者和组织使用，并且Flutter是完全免费、开源的 
 [Flutter Dev](https://flutter.dev)
-<!--more-->
+
 
 # 环境配置
 我使用的是Mac系统，其实不管是Windows系统还是Linux系统，配置环境都是比较简单的。可以在网上找到相关的教程，这里我就不再赘述。如果你也是Mac系统，可以参考博客[Flutter的环境配置](https://www.jianshu.com/p/b50a92afbef1)

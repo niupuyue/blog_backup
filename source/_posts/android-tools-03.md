@@ -4,10 +4,8 @@ date: 2019-06-13 22:40:20
 tags:
   - android
 ---
-
-列表展示是在开发中经常使用到的功能，通常通过ListView或RecyclerView控件来实现。但是在列表展示中可能会碰到这样的需求，要求对列表进行分组展示，魅族都有标题itemview和内容itemview两部分组成。下面的是效果图：
-
 <!--more-->
+列表展示是在开发中经常使用到的功能，通常通过ListView或RecyclerView控件来实现。但是在列表展示中可能会碰到这样的需求，要求对列表进行分组展示，魅族都有标题itemview和内容itemview两部分组成。下面的是效果图：
 
 LinearLayoutManager:
 ![LinearLayoutManager]()

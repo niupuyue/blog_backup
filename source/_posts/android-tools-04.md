@@ -4,9 +4,9 @@ date: 2019-07-01 20:44:10
 tags:
   - android
 ---
-
-Bamboy的自定义Toast，（
 <!--more-->
+Bamboy的自定义Toast，（
+
 以下称作“BToast”）
 特点在于使用简单，
 并且自带两种样式：

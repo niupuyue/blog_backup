@@ -5,12 +5,12 @@ tags:
   - Kotlin
   - android
 ---
-
+<!--more-->
 # 概述
 
 Kotlin 是一种在 Java 虚拟机上运行的静态类型编程语言，被称之为 Android 世界的Swift，由 JetBrains 设计开发并开源。
 Kotlin 可以编译成Java字节码，也可以编译成 JavaScript，方便在没有 JVM 的设备上运行。
-<!--more-->
+
 # kotlin继承android开发环境
 
 在Android Studio3.0以后的版本，自动能够使用kotlin作为开发语言

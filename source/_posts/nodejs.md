@@ -5,7 +5,7 @@ tags:
   - nodejs
   - express
 ---
-
+<!--more-->
 > 项目介绍：基于nodejs+mysql+express+jade的招聘信息类网站构建
 
 #node
@@ -15,8 +15,6 @@ Nodejs是一个事件驱动I/O服务端JavaScript环境，基于Google浏览器V
 ## node安装
 直接在百度中搜索node，或者直接点击下载链接<a href="http://nodejs.cn">node中文网</a>
 下载对应的版本之后，安装提示默认安装即可。
-
-<!--more-->
 
 ## nodejs的第一次体验
 使用nodejs创建一个项目一般分为三部分，如下

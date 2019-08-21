@@ -5,7 +5,7 @@ tags:
   - java
   - mysql
 ---
-
+<!--more-->
 # Mac下使用mysql笔记
 ## 连接mysql
 打开mysql服务，然后在终端中输入
@@ -16,7 +16,7 @@ mysql -u root -p 123456
 ```
 mysql --user=root --host=3306 --password=123456
 ```
-<!--more-->
+
 ## SQl语句
 SQL语句是结构化查询语句
 ### SQL语句分类

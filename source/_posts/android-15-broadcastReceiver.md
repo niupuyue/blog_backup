@@ -4,13 +4,14 @@ date: 2016-09-15 14:26:36
 tags:
   - android
 ---
+<!--more-->
 
 > BroadcastReceiver 广播接受者用于接受系统或者其他应用程序发送的广播
 
 # 注册广播
 在Android中如果我们想要使用广播，就必须自定义广播接收者
 需要写一个类继承BroadcastReceiver，并且重写里面的onReceiver()方法，实现接受特定的广播，然后去执行相应的事情
-<!--more-->
+
 自定义一个广播接受者
 ```
 public class MyBroadCastReceiver extends BroadcastReceiver   
