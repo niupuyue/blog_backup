@@ -5,7 +5,6 @@ tags:
   - android
 ---
 <!--more-->
-
 > BroadcastReceiver 广播接受者用于接受系统或者其他应用程序发送的广播
 
 # 注册广播
