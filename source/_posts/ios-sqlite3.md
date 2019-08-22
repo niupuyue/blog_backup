@@ -3,8 +3,9 @@ title: ios-sqlite3数据库操作
 date: 2018-05-18 16:30:23
 tags:
 ---
-<!--more-->
+
 # 介绍
+<!--more-->
 sqlite是纯C语言中底层的数据库，在OC和Swift中都是经常使用的数据库，在开发中，可以使用代码创建数据库，可以使用图形化界面创建数据库。例如SQLiteManager、SQLiteStudio等
 
 # 常用方法

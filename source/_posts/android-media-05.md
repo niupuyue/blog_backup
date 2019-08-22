@@ -5,9 +5,9 @@ tags:
   - android
   - 音视频
 ---
-<!--more-->
-# 学习Android平台的MediaExtractor和MediaMuxer API，知道如何解析和封装mp4文件
 
+# 学习Android平台的MediaExtractor和MediaMuxer API，知道如何解析和封装mp4文件
+<!--more-->
 # MediaExtractor API
 
 作用：可以把音视频文件的音频和视频分离，并且抽取相应的数据通道，然后进行操作

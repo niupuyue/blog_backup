@@ -4,9 +4,9 @@ date: 2019-07-12 22:42:10
 tags:
   -android
 ---
-<!--more-->
-android软键盘属性SoftInputMode属性设置介绍
 
+android软键盘属性SoftInputMode属性设置介绍
+<!--more-->
 SoftInputMode用来设置软键盘的各种属性.有两种方式可以设置，第一种是在清单配置文件也就是AndroidManifest.xml文件，另一种也就是在java代码中动态设置
 
 ```

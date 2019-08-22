@@ -5,9 +5,9 @@ tags:
   - nodejs
   - express
 ---
-<!--more-->
-> 项目介绍：基于nodejs+mysql+express+jade的招聘信息类网站构建
 
+项目介绍：基于nodejs+mysql+express+jade的招聘信息类网站构建
+<!--more-->
 #node
 ## 定义
 简单来说Nodejs就是运行在服务端的JavaScript
