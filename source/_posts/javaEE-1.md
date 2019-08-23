@@ -6,7 +6,7 @@ tags:
   - mysql
 ---
 
-# Mac下使用mysql笔记
+Mac下使用mysql笔记
 <!--more-->
 ## 连接mysql
 打开mysql服务，然后在终端中输入

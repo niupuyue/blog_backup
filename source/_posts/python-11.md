@@ -4,9 +4,7 @@ date: 2019-08-06 21:51:10
 tags:
   - Python
 ---
-
-# 条件判断
-
+循环语句
 <!--more-->
 
 Python的循环语句分为两种，for和while循环

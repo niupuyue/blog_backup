@@ -4,9 +4,10 @@ date: 2018-05-16 09:15:30
 tags:
   - ios
 ---
-
-# 遍历某个文件夹的文件
+文件操作
 <!--more-->
+# 遍历某个文件夹的文件
+
 ## 获取当前路径
 ```
 let manager = FileManager.default

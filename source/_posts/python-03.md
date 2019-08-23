@@ -5,7 +5,7 @@ tags:
   - Python
 ---
 
-# Python的标识
+Python的标识
 <!--more-->
 在 Python 里，标识符由字母、数字、下划线组成。
 

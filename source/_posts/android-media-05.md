@@ -6,7 +6,7 @@ tags:
   - 音视频
 ---
 
-# 学习Android平台的MediaExtractor和MediaMuxer API，知道如何解析和封装mp4文件
+学习Android平台的MediaExtractor和MediaMuxer API，知道如何解析和封装mp4文件
 <!--more-->
 # MediaExtractor API
 
