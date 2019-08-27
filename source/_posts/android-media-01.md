@@ -38,6 +38,7 @@ tags:
 [FFMPEG Tips](http://ticktick.blog.51cto.com/823160/d-17)
 [Learn OpenGL 中文](https://learnopengl-cn.readthedocs.io/zh/latest/)
 [Android Graphic 架构](https://source.android.com/devices/graphics/)
+[灰色飘零](https://www.cnblogs.com/renhui/)
 
 就按照这个步骤走下去，就一定会有所收获
 
