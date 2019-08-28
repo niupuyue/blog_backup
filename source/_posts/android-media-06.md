@@ -497,3 +497,4 @@ public class MyGLSurfaceViewRendered implements GLSurfaceView.Renderer {
 # 参考资料
 [OpenGL ES API](https://www.jianshu.com/p/87abc92134dd)
 [OpenGL 绘制三角形](https://blog.csdn.net/ywl5320/article/details/80964212)
+[OpenGL 学习](https://www.jianshu.com/u/eb01968a6673)
