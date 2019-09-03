@@ -1,0 +1,75 @@
+---
+title: android奇技淫巧 15 Android沉浸式状态栏
+date: 2019-09-03 21:55:10
+tags:
+  - android
+---
+
+Android 沉浸式状态栏
+
+<!--more-->
+
+最近一段时间一直在学习Android OpenGL的内容，所以这个系列的博客停下来有一整子了。最近的项目中，UI画了一个沉浸式状态栏样式，一时之间我竟无言以对，所以趁着这个时间将沉浸式状态栏的内容总结一下
+
+首先我们需要先明确一个概念，什么是沉浸式？
+其实沉浸式一开始是从VR里面传出来的，体验过VR的小伙伴肯定都知道，在VR体验中，我们能看到的都是VR为我们提供的内容，除此之后再无其他，会让我们有一种置身于虚拟世界之中的感觉，这个就是沉浸式。
+
+那么对应到Android系统中，大多数情况下是用不到沉浸式的，只有一些比如玩游戏，看电影的时候才会用到沉浸式，如下图所示：
+![沉浸式1](/assets/tools/tools-statusbar-01.png)
+![沉浸式2](/assets/tools/tools-statusbar-02.png)
+在用户玩游戏或者看电影的时候，不会被状态栏的内容所干扰这才是真正的沉浸式。
+
+不过虽然听上去高大上的沉浸式效果，实际上也就是将内容全屏化了而已，其实Android沉浸式模式的本质就是全屏化。
+
+## 隐藏状态栏
+一个Android应用程序的界面其实有很多系统元素，如下
+![状态栏内容](/assets/tools/tools-statusbar-03.png)
+通过上图我们会发现，有状态栏，ActionBar，导航栏等组件。而打造沉浸式模式的用户体验，就是要将这个系统元素全部隐藏，只留下主体部分。
+例如，我这里在布局文件中添加一个ImageView，那么他的样式应该是这样的
+```
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@mipmap/bg_01" />
+
+</RelativeLayout>
+```
+![添加图片效果](/assets/tools/tools-statusbar-04.png)
+这样的效果很明显不是我们想要的，所以我们一步一步的来。首先隐藏状态栏，在Android4.1以下和4.1以上的版本中隐藏状态栏和ActionBar的方式不一样。不过这里我只考虑了4.1以上的版本。
+
+先来看一下代码
+```
+public class Layout1Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_layout_1);
+        // 隐藏状态栏和ActionBar
+        View decorView = getWindow().getDecorView();
+        int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(option);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+    }
+}
+```
+效果:
+![隐藏状态栏和ActionBar](/assets/tools/tools-statusbar-05.png)
+
+这里我们先通过getWindow().getDecorView()方法获取当前页面的DecorView，然后在调用他的setSystemUiVisibility()方法来设置系统UI元素的可见性。其中SYSTEM_UI_FLAG_FULLSCREEN表示全屏的意思，也就是会将状态栏隐藏掉。另外，根据Android的设计建议，ActionBar是不应该独立于状态栏单独现实的，所以我们果断把ActionBar使用hide()方法将其隐藏掉。
+
+这个看上去有点沉浸式的样子了，而我们的UI小姐姐想让我做出来的是这样的效果
+![预览样式](/assets/tools/tools-statusbar-06.png)
+
+其实也很简单，只需要使用另外一种flag就可以了
+
+
+# 参考博客
+[Android状态栏微技巧，带你真正理解沉浸式模式](https://blog.csdn.net/guolin_blog/article/details/51763825)
