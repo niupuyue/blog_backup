@@ -269,7 +269,7 @@ public class Layout1Activity extends AppCompatActivity {
     android:screenOrientation="landscape" />
 ```
 
-
+[demo地址](https://github.com/xiaoniudadi/blog_demo_android/tree/master/ImmersiveStatusBarDemo)
 
 
 # 参考博客
