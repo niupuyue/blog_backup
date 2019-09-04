@@ -69,6 +69,207 @@ public class Layout1Activity extends AppCompatActivity {
 ![预览样式](/assets/tools/tools-statusbar-06.png)
 
 其实也很简单，只需要使用另外一种flag就可以了
+```
+public class Layout1Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_layout_1);
+        // 隐藏状态栏和ActionBar
+//        View decorView = getWindow().getDecorView();
+//        int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(option);
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        // 另一种效果
+        if (Build.VERSION.SDK_INT >= 21){
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(option);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+    }
+}
+```
+效果如下所示
+![预览样式](/assets/tools/tools-statusbar-07.png)
+
+首先我们注意到，这样的样式只有5.0以上的系统才能支持，所以这里我们先判断，只有大于5.0系统才能使用。接下来我们使用SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN和SYSTEM_UI_FLAG_LAYOUT_STABLE，这两个flat必须结合在一起使用，表示会让应用的主体内容占用系统状态栏的空间，最后在调用Window的setStatusBarColor()方法将状态栏设置为透明颜色。
+
+## 隐藏导航栏
+现在我们已经隐藏了状态栏效果，不过在屏幕的下方我们会发现导航栏还是存在的，接下来我们就对导航栏进行隐藏。
+
+其实原理是一样的，隐藏导航栏也就是使用了不同的UI flag而已，修改代码中的部分内容即可
+```
+public class Layout1Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_layout_1);
+        // 隐藏状态栏和ActionBar
+//        View decorView = getWindow().getDecorView();
+//        int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(option);
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        // 另一种效果
+//        if (Build.VERSION.SDK_INT >= 21){
+//            View decorView = getWindow().getDecorView();
+//            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+//            decorView.setSystemUiVisibility(option);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        // 隐藏导航栏
+        View decorView = getWindow().getDecorView();
+        int option = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(option);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+    }
+}
+```
+
+![效果预览](/assets/tools/tools-statusbar-08.png)
+
+这里我们同时使用了SYSTEM_UI_FLAG_HIDE_NAVIGATION和SYSTEM_UI_FLAG_FULLSCREEN，这样就可以将状态栏和导航栏同时隐藏
+
+虽然我们实现了全屏化，但是还是相差比较远，因为再这样的模式下，只要我们随意的触摸屏幕，就会退出全屏模式。
+
+除了隐藏导航栏之外，我们也要实现刚才的透明状态栏的效果，其实就是将两部分代码合并一下。
+
+```
+public class Layout1Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_layout_1);
+        // 隐藏状态栏和ActionBar
+//        View decorView = getWindow().getDecorView();
+//        int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(option);
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        // 另一种效果
+//        if (Build.VERSION.SDK_INT >= 21){
+//            View decorView = getWindow().getDecorView();
+//            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+//            decorView.setSystemUiVisibility(option);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        // 隐藏导航栏
+//        View decorView = getWindow().getDecorView();
+//        int option = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(option);
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        if (Build.VERSION.SDK_INT >= 21){
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(option);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+    }
+}
+```
+
+![效果预览](/assets/tools/tools-statusbar-09.png)
+
+这里我们使用SYSTEM_UI_FLAG_HIDE_NAVIGATION表示会让应用的主体内容占用系统导航栏的空间，然后又调用了setNavigation()方法将导航栏设置为透明颜色
+
+## 真正的沉浸式模式
+
+其实不管我们是否误解了沉浸式模式，但是这种模式的的确确的存在，那么我们应该怎么样才能实现像视频播放或者游戏中这样的模式呢？我们只需要重写Activity中的onWindowFocusChanged()方法，然后加入如下的逻辑即可
+
+```
+public class Layout1Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_layout_1);
+        // 隐藏状态栏和ActionBar
+//        View decorView = getWindow().getDecorView();
+//        int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(option);
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        // 另一种效果
+//        if (Build.VERSION.SDK_INT >= 21){
+//            View decorView = getWindow().getDecorView();
+//            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+//            decorView.setSystemUiVisibility(option);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+        // 隐藏导航栏
+//        View decorView = getWindow().getDecorView();
+//        int option = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(option);
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+
+//        if (Build.VERSION.SDK_INT >= 21){
+//            View decorView = getWindow().getDecorView();
+//            int option = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+//            decorView.setSystemUiVisibility(option);
+//            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && Build.VERSION.SDK_INT >= 19){
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            decorView.setSystemUiVisibility(option);
+        }
+    }
+}
+```
+![效果预览](/assets/tools/tools-statusbar-10.png)
+
+沉浸式模式的UI flag就这些了，如果我们真的需要实现沉浸式，直接将上面的代码应用到Activity中即可。需要注意的是，这种沉浸式模式只有在Android4.4以上的版本才支持，所以这里也是要加判断的
+如果我们需要横屏展示，只需要在配置文件中加入如下代码即可
+```
+<activity android:name=".MainActivity"
+    android:screenOrientation="landscape" />
+```
+
+
 
 
 # 参考博客
