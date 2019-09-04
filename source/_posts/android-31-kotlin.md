@@ -473,3 +473,551 @@ fun main(args: Array<String>) {
 }
 ```
 
+# 条件控制
+
+## IF表达式
+一个if语句包含一个布尔表达式和一条或多条语句
+```
+// 普通用法
+var max = a
+if (a < b) max = b
+
+// 使用else
+var max: Int
+if (a > b){
+  max = a
+} else {
+  max = b
+}
+
+// 作为表达式
+val max = if (a > b) a else b
+```
+
+我们也可以吧IF语句的表达式的结果赋值给一个变量
+```
+val max = if (a > b){
+  print("选择a")
+  a
+} else {
+  print("选择b")
+  b
+}
+```
+
+这也说明我们不需要像java那样有三元运算符，因为我们可以使用他的简单实现
+```
+val c = if (condition) a else b
+```
+
+一个例子
+```
+fun main(args: Array<String>){
+  var x= 0
+  if(x >0){
+    println("x 大于0")
+  }else if(x == 0){
+    println("x 等于0")
+  }else {
+    println("x 小于0")
+  }
+
+  var a = 1;
+  var b = 2;
+  val c = if(a>=b) a else b
+}
+```
+
+输出结果如下：
+```
+x 等于 0
+c 的值为 2
+```
+
+## 使用区间
+使用in运算符来检测某个数字是否在指定区间内
+```
+fun main(args: Array<String>){
+  val x = 5;
+  val y = 9;
+  if(x in 1..8){
+    println("x 在区间内")
+  }
+}
+```
+
+## When表达式
+when将他的参数和所有的分支条件顺序比较，直到某个分支满足条件
+when既可以被当做表达式使用也可以被当做语句使用，如果它被当作表达式，符合条件的分支的值就是整个表达式的值，如果当做语句使用，则忽略个别分支的值
+when类似java语言中的switch
+```
+when(x){
+  1 -> print("x= 1")
+  2 -> print("x=2")
+  else -> {
+    print("x 不是1，也不是2")
+  }
+}
+```
+在when中，else同switch的default，如果其他分支都不满足条件则会求值else分支
+如果很多分支需要相同的方式出里，则可以把多个分支条件放在一起，用逗号隔开
+```
+when(x){
+  0,1 -> print("x=0或者x=1")
+  else -> print("otherwise")
+}
+```
+
+我们也可以检测一个值在(in) 或者不在(!in)一个区间或者集合中
+```
+when(x){
+  in 1..10 -> print("x 在1到10之间")
+  in validNumbers -> print("x 是有效数字")
+  !in 10..20 -> print("想不在10到20之间")
+  else -> print("以上都不是")
+}
+```
+另一种可能性是检测一个是是(is)或不是(!is)一个特定类型的值，注意如果是只能转换，我们可以访问该类型的方法和属性而无需任何额外的检测
+```
+fun test(x:Any) = when(x){
+  is String -> x.startWith("xxx")
+  else -> false
+}
+```
+when也可以用来替换if-else语句，如果不提供参数，所有的分支条件都是简单布尔表达式，而当一个分支的条件为真时执行该分支
+```
+when{
+  x.isOdd() -> print("x是老版本")
+  x.isEven() -> print()
+  else -> print()
+}
+```
+
+一个例子：
+```
+fun main(args: Array<String>) {
+    var x = 0
+    when (x) {
+        0, 1 -> println("x == 0 or x == 1")
+        else -> println("otherwise")
+    }
+
+    when (x) {
+        1 -> println("x == 1")
+        2 -> println("x == 2")
+        else -> { // 注意这个块
+            println("x 不是 1 ，也不是 2")
+        }
+    }
+
+    when (x) {
+        in 0..10 -> println("x 在该区间范围内")
+        else -> println("x 不在该区间范围内")
+    }
+}
+```
+
+# 循环控制
+
+## for循环
+for循环可以对任何提供迭代器的对象进行遍历，例如for循环
+如果我们想要通过索引遍历一个数组或者list，我们就可以这么做
+```
+for(x in array.indices){
+  print(array[x])
+}
+```
+注意上面，在区间上遍历会编译成优化的实现而不会创建额外的对象
+或者我们可以使用库函数withIndex
+```
+for((index,value) in array.withInde()){
+  println("the element at $index is $value")
+}
+```
+一个例子
+```
+fun main(args:Array<String>){
+  val items = listOf("hello","world","my name","paulniu")
+  for(item in items){
+    println(item)
+  }
+  for(index in items.indices){
+    println("item at $index is ${items[index]}")
+  }
+}
+```
+
+## while和do...while循环
+while循环是最基本的循环
+do...while循环对于while循环来说，如果不满足条件则不能进入循环。但有时候我们需要即使不满足条件，也至少执行一次
+do...while循环和while循环相似，不同的是，do...while循环至少会执行一次
+一个例子
+```
+fun main(args:Array<String>){
+  var x= 5
+  while(x >0){
+    print(x--)
+  }
+  var y = 5
+  do{
+    println(y--)
+  }while(y > 0)
+}
+```
+
+## 返回和跳转
+Kotlin有三种结构化跳转表达式
+1. return 默认从最直接包围他的函数或匿名函数返回
+2. break 终止最直接包围他的训话
+3. continue 继续下一次最直接包围他的循环
+在循环中Kotlin支持传统的break和continue操作符
+```
+fun main(args: Array<String>) {
+    for (i in 1..10) {
+        if (i==3) continue  // i 为 3 时跳过当前循环，继续下一次循环
+        println(i)
+        if (i>5) break   // i 为 6 时 跳出循环
+    }
+}
+```
+
+#### Break和Continue标签
+在Kotlin中任何表达式都可以用标签(label)标记，标签格式为标识符后面跟@符号
+```
+loop@ for (i in 1..100) {
+    for (j in 1..100) {
+        if (……) break@loop
+    }
+}
+```
+标签限制的break跳转到刚好位于该标签指定的循环后面的执行点，continue继续标签指定的循环的下一次迭代
+
+#### 标签返回
+Kotlin有函数字面量，局部函数和对象表达式，因此Kotlin的函数可以被嵌套。标签限制的return允许我们从外层函数返回。最重要的一个用途就是从lambda表达式中返回，例如
+```
+fun f(){
+  ints.forEach{
+    if(it == 0) return
+    print(it)
+  }
+}
+```
+这个return表达式从最直接包围他的函数即f行数中返回(注意这种非局部的返回只支持传给内联函数的lambda表达式)。如果我们需要从lambda表达式中返回，则必须给它加标签并用以限制return
+```
+fun foo() {
+    ints.forEach lit@ {
+        if (it == 0) return@lit
+        print(it)
+    }
+}
+```
+
+# 类与对象
+
+### 类定义
+Kotlin类包含：构造函数和初始化代码块，函数，属性，内部类，对象声明
+Kotlin使用关键字class声明类，后面紧跟类名
+```
+class Student{
+  fun function(){
+
+  }
+}
+// 同时我们也可以声明一个空类
+class Empty
+```
+
+### 类的属性
+
+#### 属性定义
+类的属性可以使用关键字var声明为可变的，否则使用只读关键字val声明为不可变
+```
+class Demo{
+  var name:String = ""
+  var age:Int = 22
+  var address: String=""
+}
+```
+我们可以使用普通函数那样使用构造函数创建类实例
+```
+var demo = Demo()// 注意Kotlin中没有new关键字
+```
+如果要使用一个属性，直接用名称引用即可
+```
+demo.name
+demo.age
+```
+Kotlin中类可以有一个主构造器，以及一个或多个次构造器，主构造器是类头的一部分，位于类名称之后
+```
+class Person constructor(name:String){
+
+}
+```
+如果主构造器没有任何注解，也没有任何可见度修饰符，那么constructor关键字可以省略
+```
+class Person(name:String){
+
+}
+```
+
+#### getter和setter
+getter和setter都是可选的，如果属性类型可以从初始化语句或者类的成员函数中推断出来，那也可以省略类型，val不允许设置setter函数，因为他是只读的
+```
+var allByDefault:Int? // 错误，需要一个初始化语句，默认实现了getter和setter方法
+var initialized = 1   // 类型为Int，默认实现了getter和setter方法
+val simple:Int?       // 类型为Int，默认实现了getter方法，但必须在构造函数中初始化
+val inferredType = 1  // 类型为Int类型，默认实现了getter方法
+```
+
+例子：
+```
+class Person{
+  var lastName:String = "wang"
+      get() = field.toUpperCase()     // 将变量赋值后转换为大写
+      set
+  var no: Int = 100
+      get() = field                   // 后端变量
+      set(value){
+        if(value < 10){
+          field = value
+        }else{
+          field = -1
+        }
+      }
+  var height:Float = 123.45f
+      private set        
+}
+
+// 测试
+fun main(args:Array<String>){
+  var person = Person()
+  person.lastName = "lee"
+  println("lastName: ${person.lastName}")
+  person.no = 9
+  println("no: ${person.no}")
+  person.no = 20
+  println("no: ${person.no}")
+}
+```
+输出结果：
+```
+lastName:LEE
+no:9
+no:-1
+```
+
+Kotlin中类不能有字段，提供了后端变量机制，备用字段使用field关键字声明，field关键字只能用于属性的访问器
+
+非空属性必须在定义的时候初始化，Kotlin提供了一种可以延迟初始化的方案，使用lateinit关键字描述属性
+```
+public class Test{
+  lateinit var sub:TestSubject
+  @SetUp fun setUp(){
+    sub = TestSubject()
+  }
+  @Test fun test(){
+    sub.method()
+  }
+}
+```
+
+### 主构造器
+主构造器中不能包含任何代码，初始化代码可以放在初始化代码段中，初始化代码段使用init关键字作为前缀
+```
+class Person constructor(name:String){
+  init{
+    printlin("name is $name")
+  }
+}
+```
+注意：主构造器的参数可以在初始化代码段中使用，也可以再累主题定义的属性初始化代码中使用
+一个例子：
+```
+// 我们创建一个person类，然后通过构造函数传入person的姓名，年龄，地址等信息
+class Person constructor(name:string,age:Int,address:String){
+  // 此处为类体构成
+  
+  // 初始化代码段
+  init{
+    println("初始化一个person信息，姓名是"+$name +";年龄是"+$age+";地址是"+$address)
+  }
+}
+fun main(args:Array<String>){
+  val person = Person("张三",22,"北京市海淀区")
+  println(person.name)
+  println(person.age)
+  println(person.address)
+}
+```
+
+### 次构造函数
+类也可以有二级构造函数，需要在前面加上constructor关键字
+```
+class person{
+  constructor(parent:Person){
+    parent.children.add(this)
+  }
+}
+```
+如果类有主构造函数，每个次构造函数或者直接或者间接通过另一个次构造函数代理主构造函数，在同一个类中代理另一个构造函数使用this关键字
+```
+class Person(val name:String){
+  constructor(name:String,age:int):this(name){
+    // 执行初始化操作
+  }
+}
+```
+如果一个非抽象类没有声明构造函数(包括主构造函数和次构造函数)，它会产生一个没有参数的构造函数，构造函数都是public，如果我们不想我们的类有公共的构造函数，那么我们就必须声明一个空的主构造函数
+```
+class DontCreateMe private constructor(){
+
+}
+```
+> 注意：在JVM虚拟机中，如果主构造函数的所有参数都有默认值，编译器就会生成一个附加的无参的构造函数，这个构造函数会直接使用默认值
+
+一个例子
+```
+class MyClass constructor(name:String){
+  var url:String= "http://www.baidu.com"
+  var country:String = "CN"
+  var siteName = name
+
+  init{
+    println("初始化网站名称: ${name}")
+  }
+
+  // 次构造函数
+  constructor (name:String,age:Int) :this(name){
+    println("age 是： $age")
+  }
+
+}
+fun main(args:Array<String>){
+  val website = MyClass("http://www.paulniu.com",22)
+  println(website.siteName)
+  println(website.url)
+  println(website.country)
+}
+```
+
+## 抽象类
+抽象是面向对象编程的特征之一，类本身或者类中的部分成员都是可以声明为abstract的。抽象成员在类中不存在具体的实现.注意：无需对抽象类或者抽象成员标注open注解
+```
+open class Base{
+  open fun f(){
+
+  }
+}
+abstract class myAAA:Base(){
+  override abstract fun f()
+}
+```
+
+## 嵌套类
+我们可以把类嵌套在其他类中
+```
+class Outer {                  // 外部类
+    private val bar: Int = 1
+    class Nested {             // 嵌套类
+        fun foo() = 2
+    }
+}
+
+fun main(args: Array<String>) {
+    val demo = Outer.Nested().foo() // 调用格式：外部类.嵌套类.嵌套类方法/属性
+    println(demo)    // == 2
+}
+```
+
+## 内部类
+内部类使用inner关键字表示
+内部类会带有一个对外部类的对象的引用，所以内部类可以访问外部类成员属性和成员函数
+```
+class Outer {
+    private val bar: Int = 1
+    var v = "成员属性"
+    /**嵌套内部类**/
+    inner class Inner {
+        fun foo() = bar  // 访问外部类成员
+        fun innerTest() {
+            var o = this@Outer //获取外部类的成员变量
+            println("内部类可以引用外部类的成员，例如：" + o.v)
+        }
+    }
+}
+
+fun main(args: Array<String>) {
+    val demo = Outer().Inner().foo()
+    println(demo) //   1
+    val demo2 = Outer().Inner().innerTest()   
+    println(demo2)   // 内部类可以引用外部类的成员，例如：成员属性
+}
+```
+
+## 匿名内部类
+使用对象表达式来创建匿名内部类
+```
+class Test {
+    var v = "成员属性"
+
+    fun setInterFace(test: TestInterFace) {
+        test.test()
+    }
+}
+
+/**
+ * 定义接口
+ */
+interface TestInterFace {
+    fun test()
+}
+
+fun main(args: Array<String>) {
+    var test = Test()
+
+    /**
+     * 采用对象表达式来创建接口对象，即匿名内部类的实例。
+     */
+    test.setInterFace(object : TestInterFace {
+        override fun test() {
+            println("对象表达式创建匿名内部类的实例")
+        }
+    })
+}
+```
+
+## 类的修饰符
+类的修饰符包括两个
+1. classModifier:类属性修饰符，标示类本身特性
+
+| 修饰符 | 含义
+|!-----! |!-----! |
+|abstract | 抽象类 |
+|final | 类不可继承，默认属性 |
+|enum |枚举类 |
+|open | 类可继承，类默认是final的 |
+|annotation | 注解类 |
+
+2. accessModifier：访问权限修饰符
+
+| 修饰符 | 含义 |
+|!----! | !-----! |
+|private | 仅在同一个文件中可见 |
+|protected | 同一个文件中或子类可见 |
+| public | 所有调用的地方都可见 |
+|internal | 同一个模块中可见 |
+
+一个例子：
+```
+// 文件名：example.kt
+package foo
+
+private fun foo() {} // 在 example.kt 内可见
+
+public var bar: Int = 5 // 该属性随处可见
+
+internal val baz = 6    // 相同模块内可见
+```
+
+
+
