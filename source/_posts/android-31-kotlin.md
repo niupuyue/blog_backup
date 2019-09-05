@@ -1019,5 +1019,121 @@ public var bar: Int = 5 // 该属性随处可见
 internal val baz = 6    // 相同模块内可见
 ```
 
+# 继承
 
+Kotlin中所有类都继承自Any类，他是所有类的超类，对于没有超类型声明的类是默认超类
+
+Any默认提供了三个函数
+```
+equals()
+hashCode()
+toString()
+```
+
+注意：Any不是java中的Object
+
+如果一个类要被继承，可以使用open关键字进行修饰
+```
+open class Base(p:Int){
+  // 定义基类
+}
+class Text(p:Int):Base(p){
+
+}
+```
+
+## 构造函数
+
+### 子类有主构造函数
+
+如果子类中有主构造函数，则基类必须在主构造函数中立即初始化
+
+```
+open class Person(ver name:String,var age:Int){
+  // 基类
+}
+class Student(name:String,age:Int,var no:String,var score:Int) :Person(name,age){
+
+}
+
+// 测试
+fun main(args:Array<String>){
+  var s = Student("张三",18,"s123456",89)
+  println("学生姓名是：${s.name}"
+  println("学生年龄是：$(s.age)"))
+  println("学生号是：${s.no}")
+  println("成绩是：${s.score}")
+}
+```
+
+### 子类没有主构造函数
+
+如果子类没有主构造函数，则必须在每一个二级构造函数中使用super关键字初始化基类，或者在代理另一个构造函数。初始化基类时，可以调用基类的不同构造方法
+```
+class Student:Person{
+  constructor(ctx:Context):super(ctx){
+
+  }
+
+  constructor(ctx;Context,attrs:AttributeSet) :Super(ctx,attrs){
+
+  }
+}
+```
+
+
+一个例子
+```
+open class Person(name:String){
+  // 次级构造函数
+  constructor(name:String,age:Int):this(name){
+    // 初始化操作
+    println("-------------基本次级构造函数-------------")
+  }
+}
+
+// 子类继承Person类
+class Student:Person{
+  // 次级构造函数
+  contructor(name:String,age:Int,no:String,score:Int):super(name,age){
+    println("学生姓名是：${name}"
+  println("学生年龄是：$(age)"))
+  println("学生号是：${no}")
+  println("成绩是：${score}")
+  }
+}
+```
+
+## 重写
+在基类中，使用fun声明函数时，此函数默认为final修饰，不能被子类重写，如果要允许子类重写，就要手动添加关键字open，子类重写时使用override关键字
+```
+// 用户基类
+open class Person{
+  open fun study(){
+    // 允许子类重写
+    println("gogogo")
+  }
+}
+// 子类继承Person类
+class Student:Person(){
+  override fun study(){
+    // 重写父类方法
+    println("hahaha")
+  }
+}
+
+fun main(args:Array<String>){
+  val ss = Student()
+  s.study()
+}
+```
+
+入股有很多相同的方法(继承或者实现自其它类)，则必须重写该方法，使用super规范去选择性的调用父类的实现
+```
+open class A{
+  open fun f(){
+    print("A")
+  }
+}
+```
 
