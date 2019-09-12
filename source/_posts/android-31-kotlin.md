@@ -1137,4 +1137,67 @@ open class A{
 }
 ```
 
+## 属性重写
+属性重写使用override关键字，属性必须具有兼容类型，每一个声明的属性都可以通过初始化程序或者getter方法被重写
+```
+open class Foo{
+  open val x:Int get{}
+}
 
+class class1 : Foo{
+  override val x:Int
+}
+```
+我们可用var属性来重写一个val属性，但反过来是不行的。因为val属性本身就定义了getter方法，重写为var属性会在衍生类中额外声明一个setter方法
+可以在主构造函数中使用override关键字作为属性声明的一部分
+```
+interface Foo{
+  val count:Int
+}
+class class1(override val count:Int):Foo
+
+class class2:Foo{
+  override var count:Int = 0
+}
+```
+
+还有几点需要注意：
+1. 子类继承父类是，不能有跟父类同名的变量，除非父类中该变量为private，或者父类中该变量为open，并且子类使用override关键字重写，如下
+```
+open class Person(var name:String,var age:Int){
+  open var sex: String = "unknow"
+  init{
+    println("执行父类的构造方法")
+  }
+}
+// 子类的主构造方法的那么前面也加了var，这是不允许的，会报错
+class Student(var name:String,var age:Int,var no:String,var score:Int):Person(name,age){
+  override var sex:String ="male"
+}
+```
+
+2. 子类不一定调用父类和接口中共同拥有的的同名方法
+
+# 接口
+Kotlin接口和java8类似，使用关键字interface关键自定义接口，允许方法有默认实现
+```
+interface MyInterface{
+  fun func()
+  fun func2(){
+
+  }
+}
+```
+
+## 实现接口
+```
+class Child:MyInterface{
+  override fun func(){
+
+  }
+}
+```
+举个例子
+```
+
+```
