@@ -1398,3 +1398,206 @@ val <T>List<T>.lastIndex:Int{
 ```
 扩展属性允许定义在类或者Kotlin文件中，不允许定义在函数中。初始化属性因为属性没有后端字段，所以不允许被初始化，只能由现实提供的getter/setter定义
 
+> 扩展属性只能被声明为val
+
+## 伴生对象的扩展
+如果一个类定义有一个伴生对象，我们可以对伴生对象定义扩展函数和属性
+伴生对象通过"类名."的形式调用伴生对象，伴生对象声明的扩展函数，通过用类名限定符来调用
+```
+class MyClass{
+  companion object{
+    // 将被称为"Companion"
+  }
+}
+fun MyClass.Companion.foo(){
+  println("伴随对象的扩展函数")
+}
+val MyClass.Companion.no:Int
+  get() = 10
+fun main(args:Array<String>){
+  println("no:${MyClass.no}")
+  MyClass.foo()
+}  
+```
+
+## 扩展的作用域
+通常扩展函数或属性定义在顶级包下，要使用所定义包之外的一个扩展，通过import导入扩展的函数名进行使用
+```
+package com.expamle.paulniu
+
+import foo.bar.goo // 导入所有名为goo的扩展
+import foo.bar.*   // 从foo.bar导入一切
+fun usage(baz:Baz){
+  baz.goo()
+}
+
+
+package foo.bar
+fun Baz.goo(){
+  // 方法体
+}
+```
+
+## 扩展声明为成员
+在一个类内部我们可以为另一个类声明扩展
+在这个扩展中，有多个隐含的接受者，其中扩展方法定义所在的类的实例称为分发接受者，而扩展方法的目标类型的实例被称为扩展接受者
+
+```
+class D{
+  fun bar(){
+    println("D bar")
+  }
+}
+class C{
+  fun baz(){
+    println("C baz")
+  }
+  fun D.foo(){
+    bar()
+    baz()
+  }
+  fun caller(d:D){
+    d.foo()
+  }
+}
+fun main(args:Array<String>){
+  val c:C = C()
+  val d:D = D()
+  c.caller(d)
+}
+```
+在C类内，创建D类的扩展，此时C被称为分发接受者，而D为扩展接受者，在扩展函数中，可以调用派发接受者的成员函数
+加入在调用某一个函数，而该函数在分发接受者和扩展接受者均存在，则以扩展接受者优先，要引用分发接受者的成员可以使用this的指定语法
+
+```
+class D {
+    fun bar() { println("D bar") }
+}
+
+class C {
+    fun bar() { println("C bar") }  // 与 D 类 的 bar 同名
+
+    fun D.foo() {
+        bar()         // 调用 D.bar()，扩展接收者优先
+        this@C.bar()  // 调用 C.bar()
+    }
+
+    fun caller(d: D) {
+        d.foo()   // 调用扩展函数
+    }
+}
+
+fun main(args: Array<String>) {
+    val c: C = C()
+    val d: D = D()
+    c.caller(d)
+
+}
+```
+
+以成员的形式定义的扩展函数，可以生命为open，而且可以在子类中覆盖，也就是说，在这类扩展函数的派发过程中，针对分发接受者是虚拟的，但针对扩展接受者仍然是静态的
+```
+open class D {
+}
+
+class D1 : D() {
+}
+
+open class C {
+    open fun D.foo() {
+        println("D.foo in C")
+    }
+
+    open fun D1.foo() {
+        println("D1.foo in C")
+    }
+
+    fun caller(d: D) {
+        d.foo()   // 调用扩展函数
+    }
+}
+
+class C1 : C() {
+    override fun D.foo() {
+        println("D.foo in C1")
+    }
+
+    override fun D1.foo() {
+        println("D1.foo in C1")
+    }
+}
+
+
+fun main(args: Array<String>) {
+    C().caller(D())   // 输出 "D.foo in C"
+    C1().caller(D())  // 输出 "D.foo in C1" —— 分发接收者虚拟解析
+    C().caller(D1())  // 输出 "D.foo in C" —— 扩展接收者静态解析
+
+}
+```
+
+# Kotlin数据类和密封类
+
+## 数据类
+Kotlin可以创建一个只包含数据的类，关键字为data
+```
+data class User(val name:String,val age:Int)
+```
+编译器会自动的从主构造函数中根据所声明的属性提取一下函数
+- equals()/hashCode()
+- toString()  格式如"User(name=paulniu,age=18)"
+- componentN() functions对应于属性，按声明顺序排列
+- copy() 函数
+如果这些函数再累中已经被明确定义了，或者从超类中继承而来，就不会再生成
+为了保证生成代码的一致性以及有意义，数据类需要满足一下几个条件
+1. 主构造函数至少包含一个参数
+2. 所有的主构造函数的参数必须标识为val或者var
+3. 数据类型不可以声明为abstract，open，sealed或者inner
+4. 数据类不能继承其他类(但可以实现接口)
+
+## 复制
+复制使用copy函数，我们可以使用该函数复制对象并修改部分属性，例如上面的User类
+```
+fun copy(name:String=this.name,age:Int=this.age) = User(name,age)
+```
+举个例子
+```
+data class User(val name:String,val age:Int)
+fun main(args:Array<String>){
+  val jack = User(name = "Jack",age = 1)
+  val olderJack = jack.copy(age = 2)
+  println(jack)
+  println(olderJack)
+}
+```
+
+### 密封类
+密封类用来表示受限的类继承结构：当一个值为有限几种的类型，而不能有任何其他类型时，在某种意义上，他们是枚举类的扩展，枚举类型的值集合也是受限的，但每个枚举常量只存在一个实例，而密封类的一个子类可以有包含状态的多个实例，声明一个密封类使用sealed修饰类，密封类可以有子类，但是所有子类必须要内嵌到密封类中
+sealed不能修饰interface，abstract class
+
+```
+sealed class Expr
+data class Const(val number: Double) : Expr()
+data class Sum(val e1: Expr, val e2: Expr) : Expr()
+object NotANumber : Expr()
+
+fun eval(expr: Expr): Double = when (expr) {
+    is Const -> expr.number
+    is Sum -> eval(expr.e1) + eval(expr.e2)
+    NotANumber -> Double.NaN
+}
+```
+使用密封类的关键好处在于使用when表达式的时候，如果能够验证语句覆盖了所有情况，就不需要为该语句在添加一个else子语句了
+```
+fun eval(expr: Expr): Double = when(expr) {
+    is Expr.Const -> expr.number
+    is Expr.Sum -> eval(expr.e1) + eval(expr.e2)
+    Expr.NotANumber -> Double.NaN
+    // 不再需要 `else` 子句，因为我们已经覆盖了所有的情况
+}
+```
+
+
+
+
+
