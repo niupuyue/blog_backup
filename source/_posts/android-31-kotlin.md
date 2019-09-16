@@ -1199,5 +1199,202 @@ class Child:MyInterface{
 ```
 举个例子
 ```
-
+interface MyInterface {
+    fun bar()
+    fun foo() {
+        // 可选的方法体
+        println("foo")
+    }
+}
+class Child : MyInterface {
+    override fun bar() {
+        // 方法体
+        println("bar")
+    }
+}
+fun main(args: Array<String>) {
+    val c =  Child()
+    c.foo();
+    c.bar();
+ 
+}
 ```
+
+## 接口中的属性
+接口中的属性只能是抽象的，不允许初始化值，接口不会保存属性值，实现接口是，必须重写属性
+```
+interface MyInterface{
+  var name:String // name属性，抽象
+}
+class MyImpl:MyInterface{
+  override var name:String = "paulniu"  // 重写属性
+}
+```
+举个例子
+```
+interface MyInterface {
+    var name:String //name 属性, 抽象的
+    fun bar()
+    fun foo() {
+        // 可选的方法体
+        println("foo")
+    }
+}
+class Child : MyInterface {
+    override var name: String = "runoob" //重写属性
+    override fun bar() {
+        // 方法体
+        println("bar")
+    }
+}
+fun main(args: Array<String>) {
+    val c =  Child()
+    c.foo();
+    c.bar();
+    println(c.name)
+ 
+}
+```
+
+## 函数的重写
+实现多个接口时，可能会遇到同一个方法继承多个实现类的问题，
+```
+interface A {
+    fun foo() { print("A") }   // 已实现
+    fun bar()                  // 未实现，没有方法体，是抽象的
+}
+ 
+interface B {
+    fun foo() { print("B") }   // 已实现
+    fun bar() { print("bar") } // 已实现
+}
+ 
+class C : A {
+    override fun bar() { print("bar") }   // 重写
+}
+ 
+class D : A, B {
+    override fun foo() {
+        super<A>.foo()
+        super<B>.foo()
+    }
+ 
+    override fun bar() {
+        super<B>.bar()
+    }
+}
+ 
+fun main(args: Array<String>) {
+    val d =  D()
+    d.foo();
+    d.bar();
+}
+```
+示例中接口A和接口B都定义了foo()和bar()方法，两者都实现了foo()，B实现了bar()方法。因为C是一个实现了A的具体类，所以必须重写bar()并且实现这个抽象方法
+然后如果我们从A和B派生D，我们需简要实现多个接口继承的所有方法，并且知名D应该如何实现他们。
+
+# Kotlin的扩展
+Kotlin可以对一个类的属性和方法进行扩展，且不需要继承或者使用Decorator模式
+扩展是一种静态行为，对被扩展的类代码本身不会造成任何影响
+
+
+## 扩展函数
+扩展函数可以在已有类中添加新方法，不会对原有类做出修改，扩展函数定义形式为
+```
+fun receiverType.functionName(params){
+  // 方法的具体实现
+}
+```
+其中
+- receiverType：表示函数的接收者，也就是函数的扩展的对象
+- functionName：扩展函数的名称
+- params：扩展函数的参数，可以是NULL
+
+一个小例子
+```
+class User(var name:String)
+
+// 扩展函数
+fun User.Print(){
+  print("用户名是${name}")
+}
+
+fun main(args:Array<String>){
+  var user = User("paulniu")
+  user.print()
+}
+```
+
+一个例子，为MutableList添加一个swap函数
+```
+// 扩展函数swap，调换不同位置的值
+fun MutableList<Int>.swap(index1:Int,index2:Int){
+  val tmp = this[index1]
+  this[index1] = this[index2]
+  this[index2] = tmp
+}
+
+fun main(args:Array<String>){
+  val l = mutableListOf(1,2,3)
+  l.swap(0,2)
+  println(l.toString())
+}
+```
+> this关键字指代接收者对象
+
+扩展函数是静态解析的
+扩展函数是静态解析的，并不是接受这类型的虚拟成员，在调用扩展函数时，具体被调用的是哪一个函数，有调用函数的对象表达式来决定，而不是动态的类型决定的
+```
+open class C
+class D:C()
+fun c.foo() = "c"
+fun D.foo() = "d"
+fun printFoo(c:C){
+  println(c.foo())
+}
+fun main(args:Array<String>){
+  printFoo(D())
+}
+```
+如果扩展函数和成员函数一直，则使用该函数时，会优先使用成员函数
+```
+class C{
+  fun foo(){
+    println("成员函数")
+  }
+}
+fun C.foo(){
+  println("扩展函数")
+}
+
+fun main(args:Array<String>){
+  var c = C();
+  c.foo();
+}
+```
+> 输出结果是成员函数
+
+## 扩展一个空对象
+在扩展函数内，可以通过this来判断接受者是否为NULL，这样即使接收者为NULL，也是可以调用扩展函数的
+```
+fun Any?.toString():String{
+  if(this == null){
+    return "null"
+  }else{
+    return toString()
+  }
+}
+fun main(args:Array<String>){
+  var t = null
+  println(t.toString())
+}
+```
+扩展属性
+除了函数，Kotlin也支持属性对属性进行扩展
+```
+val <T>List<T>.lastIndex:Int{
+  get() = size - 1
+}
+```
+扩展属性允许定义在类或者Kotlin文件中，不允许定义在函数中。初始化属性因为属性没有后端字段，所以不允许被初始化，只能由现实提供的getter/setter定义
+
