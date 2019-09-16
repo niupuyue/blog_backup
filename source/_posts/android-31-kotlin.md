@@ -1597,7 +1597,155 @@ fun eval(expr: Expr): Double = when(expr) {
 }
 ```
 
+# Kotlin泛型
+泛型，即参数化类型，将类型参数化，可以用在类，接口，方法上
+与java一样，Kotlin也提供了泛型，为类型安全提供了保证，消除类型强转的烦恼
+```
+class Box<T>(t:T){
+  var value = t
+}
+```
+创建类的实例时我们需要制定类型参数
+```
+val box:Box<Int> = Box<Int>(1)
+// 或者
+val box = Box(1)  // 编译器会进行类型推断，1类型为Int，所以编译器知道哦我们要使用的是Box<Int>
+```
 
+举个例子
+```
+class Box<T>(t : T) {
+    var value = t
+}
 
+fun main(args: Array<String>) {
+    var boxInt = Box<Int>(10)
+    var boxString = Box<String>("Runoob")
+
+    println(boxInt.value)
+    println(boxString.value)
+}
+```
+
+定义泛型类型变量可以完整的写明类型参数，如果编译器可以自动推定类型参数，也可以省略类型参数
+Kotlin泛型函数的声明与Java相同，类型参数主要放在函数名的前面
+在调用泛型函数时，如果可以推断出类型参数，可以直接省略泛型类型
+```
+fun main(args: Array<String>) {
+    val age = 23
+    val name = "runoob"
+    val bool = true
+
+    doPrintln(age)    // 整型
+    doPrintln(name)   // 字符串
+    doPrintln(bool)   // 布尔型
+}
+
+fun <T> doPrintln(content: T) {
+
+    when (content) {
+        is Int -> println("整型数字为 $content")
+        is String -> println("字符串转换为大写：${content.toUpperCase()}")
+        else -> println("T 不是整型，也不是字符串")
+    }
+}
+```
+
+#### 泛型约束
+我们可以使用泛型约束来设定一个给定参数允许使用的类型
+Kotlin中使用：对泛型的类型上限进行约束
+最常见的约束是上界
+```
+fun <T:Comparable<T>> sort(list:List<T>){
+  // ...
+}
+```
+其中comparable的子类型可以替换T
+```
+sort(listOf(1,2,3))  // Int类型是Comparable<Int>的子类型
+sort(listOf(HashMap<Int,String>()))  // 错误，HashMap<Int,String>不是Comparable<HashMap<Int,String>>的子类型
+```
+举个例子
+```
+fun <T> copyWhenGreater(list:List<T>,threshold:T):List<String>
+  where T:CharSequence,
+        T:Comparable<T>{
+          return list.filter{
+            it > threshold
+          }.map{
+            it.toString()
+          }
+        }
+```
+
+### 型变
+Kotlin中没有通配符类型，他有两个其他类型的东西，声明处型变与类型投影
+
+#### 声明处型变
+声明处的类型变异使用协变注解修饰符：in，out，消费者in，生产者out
+使用out使得一个类型参数协变，协变类型参数只能用作输出，可以作为返回值类型但无法作为入参的类型
+```
+// 定义一个支持协变的类
+class MyClass<out A>(val a:A){
+  fun foo():A{
+    return a
+  }
+}
+fun main(args:Array<String>){
+  var strCo:MyClass<String> = MyClass("paulniu")
+  var anyCo:MyClass<Any> = MyClass<Any>("bbbbbb")
+  anyCo = strCo
+  println(anyCo.foo())
+}
+```
+in使得一个类型参数逆变，逆变类型参数只能作为输入，可以作为入参的类型但无法作为返回值类型
+```
+class MyClass<in A>(a:A){
+  fun foo(a:A){
+
+  }
+}
+fun main(args:Array<String>){
+  var strDCo = MyClass("aaaaaa")
+  var anyDCo = MyClass<Any>("bbbbbbb")
+  strDCo = anDCo
+}
+```
+
+## 星号投射
+有些时候，我们想要表示刚开始并不知道类型参数的任何信息，但仍然希望能够安全的使用他，这里所谓的安全使用是指，对泛型类型定义一个类型投射，要求这个泛型类型的所有实体实例，都是这个投射的子类型
+
+- 假如类型定义为Foo<out T>,其中T是一个协变的类型参数，上界为TUpper，Foo<>等价于Foo<out TUpper> ,它表示当T未知时，我们可以安全的从Foo<>中读取TUpper类型的值
+- 假如类型定义为Foo(in T),其中T是一个反向协变的类型参数，Foo<>等价于Foo<inNothing>,它表示，当T未知时，我们不能安全的向Foo<>写入任何东西
+- 假如类型定义为Foo<T>,其中T是一个协变的类型参数，上界为TUpper，对于读取值的场合，Foo<*>等价于Foo<out TUpper>，对于写入值的场合，等价于Foo<in Nothing>
+
+如果一个泛型类型中存在多个类型参数，那么每个类型参数都可以单独投射，比如，如果定义类型为interface Function<in T,out U>,那么可以出现以下几种星号投射
+
+1. Function<*,String>  代表Function<in Nothing,String>
+2. Function<Int,*>     代表Function<Int,out Any?>
+3. function<, >        代表Function<in Nothing,out Any?>
+
+> 注意：星号投射与Java的原生类型非常类似，但可以安全使用
+> 其实我们可以认为*代指了所有类型，相当于Any?
+ 
+举个例子
+```
+class A<T>(val t:T,val t2:T,val t3:T)
+class Apple(var name:String)
+fun main(args:Array<String>){
+  // 使用类
+  val a1:A<*> = A(12,"String",Apple("苹果"))
+  val a2:a<Any?> = A(13,"String",Apple("苹果2"))
+  val apple = a1.t3
+  println(apple)
+  val apple2 = apple as Apple /// 强转为Apple类型
+  println(apple2.name)
+  // 使用数组
+  val lists:ArrayList<*> = arrayListOf("String",1,1.2f,Apple("苹果"))
+  for(item in l){
+    println(item)
+  }
+}
+```
 
 
