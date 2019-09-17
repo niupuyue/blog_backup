@@ -1820,7 +1820,354 @@ fun main(args: Array<String>) {
     printAllValues<RGB>() // 输出 RED, GREEN, BLUE
 }
 ```
+# Kotlin对象表达式和对象声明
+Kotlin用对象表达式和对象象声明来实现创建一个对某个类做了轻微改动的类的对象，且不需要去声明一个新的子类
 
+## 对象表达式
+通过对象表达式实现一个匿名内部类的对象用于方法的参数中
+```
+window.addMouseListener(object:MouseAdapter(){
+  override fun mouseClicked(e:MouseEvent){
+    //
+  }
+  override fun mouseEntered(e:MouseEvent){
 
+  }
+})
+```
+对象可以继承于某个基类，或者实现其他接口
+```
+open class A(x:Int){
+  public open val y:Int = x
+}
+interface B{
 
+}
+val ab:A = object:A(1) ,B{
+  override val y = 15
+}
+```
+如果超类型有一个构造函数，则必须传递参数给它。多个超类型和接口可以用逗号分隔
+通过对象表达式可以越过类的定义直接得到一个对象
+```
+fun main(args:Array<String>){
+  val site = object{
+    var name:String = "paulniu"
+    var url:String = "www.paulniu.com"
+  }
+  println(site.name)
+  println(site.url)
+}
+```
+
+请注意，匿名对象可以用作只在本地和私有作用域中声明的类型，如果你是用匿名对象最为公有函数的返回类型或者用作共有属性的类型，那么该函数或属性的实际类型会是匿名对象声明的超类型，如果你没有声明任何超类型，就会是Any，在匿名对象中添加的成员将无法访问
+```
+class C{
+  // 私有函数，所以其返回类型是匿名对象类型
+  private fun foo() = object{
+    val x:String = "x"
+  }
+  // 公有函数，所以其返回类型是Any
+  fun publicFoo() = object{
+    val x:String = "y"
+  }
+  fun bar(){
+    val x1 = foo().x         // 没有问题
+    val x2 = publicFoo().x   // 报错，未能解析的引用x
+  }
+}
+```
+在对象表达式中可以方便的访问到作用域中的其他变量
+```
+fun countClicks(window:JComponent){
+  var clickCount = 0
+  var enterCount = 0
+  window.addMouseListener(object:MouseAdapter(){
+    override fun mouseClicked(e:MouseEvent){
+      clickCount++
+    }
+    override fun mouseEntered(e:MouseEvent){
+      enterCount++
+    }
+  })
+}
+```
+
+## 对象声明
+Kotlin使用object关键字来声明一个对象
+Kotlin中我们可以方便的通过对象声明来获取一个单例
+```
+object DataProviderManager{
+  fun registerDataProvider(provider:DataProvider){
+    //
+  }
+  val allDataProviders:Collection<DataProvider>
+    get() = //
+}
+```
+引用该对象，我们直接使用其名称即可
+```
+DataProviderManager.registerDataProvider(...)
+```
+当然我们可以定义一个变量来获取这个对象，当我们定义两个不同的变量来获取一个对象的时候，我们并不能得到两个不同的变量，也就是说通过这种方式，我们其实实现的是单例
+```
+var data1 = DataProviderManager
+var data2 = DataProviderManager
+data1.name = "test"
+println("data1 name is ${data2.name}")
+```
+
+举个例子
+```
+object Site{
+  var url:String = ""
+  val name:String = "个人测试"
+}
+fun main(args:Array<String>){
+  var s1 = Site
+  var s2 = Site
+  s1.url = "www.paulniu.com"
+  println(s1.url)
+  println(s2.url)
+}
+```
+
+对象可以有超类型
+```
+object DefaultListener:MouseAdapter(){
+  override fun mouseClicked(e:MouseEvnet){
+    //
+  }
+  override fun mouseEntered(e:MouseEvent){
+
+  }
+}
+```
+与对象表达式不同，当对象声明在另一个类的内部时，这个对象并不能通过外部类的实例访问到该对象，而只能通过类名来访问，同样该对象也不能直接访问到外部类的方法和变量
+```
+class Site{
+  var name = "paulniu"
+  object DestTop{
+    var url ="www.paulniu.com"
+    fun showName(){
+      println{"desk legs $name"}  // 这样写是错误的，不能访问到外部类的方法和名称
+    }
+  }
+}
+fun main(args:Array<String>){
+  var site = Site()
+  site.DestTop.url  // 错误写法，不能通过外部类的实例访问到该对象
+  Site.DestTop.url  // 正确写法
+}
+```
+
+## 伴生对象
+类内部的对象声明可以用companyion关键字标记，这样他就可以与外部类关联在一起，我们就可以直接通过外部类访问到对象的内部元素
+```
+class MyClass{
+  companion object Factory{
+    fun create():MyClass = MyClass()
+  }
+}
+val instance = MyClass.create()   // 访问到对象的内部元素
+```
+我们可以省略掉该对象的对象名，然后使用Companion替代需要声明的对象名
+```
+class MyClass{
+  companion object{
+    // 
+  }
+}
+```
+> 注意：一个类中只能声明一个内部关联对象，即关键字companion只能使用一次
+
+```
+interface Factory<T>{
+  fun create() :T
+}
+class MyClass{
+  companion object:Factory<MyClass>{
+    override fun create():MyClass = MyClass()
+  }
+}
+```
+
+对象表达式和对象声明之间的语义差异
+
+- 对象表达式是在使用他们的地方立即执行的
+- 对象声明是在第一次被访问到时延迟初始化
+- 伴生对象的初始化是在相应的类被加载(解析)时，与java静态初始化器的语义相匹配
+
+# Kotlin委托
+委托模式是软件设计模式中一项基本技巧，在委托模式中，有两个对象参与处理同一个请求，接收请求的对象将请求委托给另一个对象来处理
+Kotlin直接支持委托模式，通过关键字by实现委托
+
+## 类委托
+类的委托即一个类中定义的方法实际是调用另一个类的对象的方法来实现的
+```
+// 在这个示例中，派生类Derived继承了接口Base的所有方法，并且委托一个传入的Base类的对象来执行这些方法
+interface Base{
+  fun print()
+}
+// 实现接口的被委托的类
+class BaseImpl(val x:Int):Base{
+  override fun print(){
+    print(x)
+  }
+}
+// 通过关键字by建立委托类
+class Derived(b:Base):Base by b
+fun main(args:Array<String>){
+  val b = BaseImpl(10)
+  Derived(b).print()
+}
+```
+在Derived声明中，by子句表示，将b保存在Derived的对象实例内部，而且编译器将会生继承自Base接口的所有方法，并将调用转发给b
+
+## 属性委托
+属性委托指的是一个类的某个属性值不是在类中直接进行定义，而是将其托付给一个代理类，从而实现对该类的属性统一管理
+```
+val/var <属性名>:<类型> by <表达式>
+```
+1. var/val:属性类型(可变/只读)
+2. 属性名:属性名称
+3. 类型:属性的数据类型
+4. 表达式:委托代理类
+
+by关键字之后的表达式就是委托，属性的get()方法(以及set()方法)将委托给这个对象的getValue()和setValue()方法。属性委托不必实现任何接口，但必须提供getValue()函数(var属性，还需要setValue()函数)
+
+### 定义一个被委托的类
+该类需要包含getValue()方法和setValue方法，且参数thisRef为进行委托的类的对象，prop为进行委托的属性的对象
+```
+import kotlin.reflect.KProperty
+// 定义包含属性委托的类
+class Example{
+  var p:String by Delegate()
+}
+// 委托的类
+class Delegate{
+  operator fun getValue(thisRef:Any?,property:KProperty<*>):String{
+    return "$thisRef,这里委托了 ${property.name} 属性"
+  }
+  operator fun setValue(thisRef:Any?,property:KProperty<*> ,value:String){
+    return "$thisRef的${property.name}属性赋值为$value"
+  }
+}
+fun main(args:Array<String>){
+  val e = Example()
+  println(e.p)     // 访问该属性，调用getValue()函数
+
+  e.p = "paulniu"  // 调用setValue函数
+  println(e.p)
+}
+```
+
+## 标准委托
+Kotlin的标准库中已经内置了很多工厂方法来实现属性的委托
+
+### 延迟属性Lazy
+lazy()是一个函数，接受一个Lambda表达式作为参数，返回一个Lazy<T>实例的函数，返回的实例可以作为实现延迟属性的委托：第一次调用get()汇之星已传递给lazy()的lambda表达式并记录结果，后续调用get()只是返回记录的结果
+```
+val lazyValue:String by lazy{
+  println("computed")// 第一次调用时输出，第二次调用不执行
+  "hello"
+}
+fun main(args:Array<String>){
+  println(lazyValue) // 第一次执行，执行两次输出表达式
+  println(lazyValue) // 第二次执行，只输出返回值
+}
+```
+
+### 可观察属性 Observable
+Observable可以用于实现观察者模式
+Delegates.observable()函数接收两个参数，第一个是初始化值，第二个是属性变化事件的响应器(handler)
+在属性赋值后会执行事件的响应器,它由三个参数：被赋值的属性，旧值和新值
+```
+import kotlin.properties.Delegates
+class User{
+  var name:String by Delegates.observable("初始值"){
+    prop,old,new ->
+    println("旧值：$old -> 新值：$new")
+  }
+}
+fun main(args:Array<String>){
+  val user = User()
+  user.name = "第一次赋值"
+  user.name = "第二次赋值"
+}
+```
+
+### 把属性存储在映射中
+一个常见的用例是在一个映射map里存储属性的值，这经常出现在像解析JSON或者其他"动态"事情的应用中。
+```
+class Site(val map: Map<String, Any?>) {
+    val name: String by map
+    val url: String  by map
+}
+
+fun main(args: Array<String>) {
+    // 构造函数接受一个映射参数
+    val site = Site(mapOf(
+        "name" to "菜鸟教程",
+        "url"  to "www.runoob.com"
+    ))
+    
+    // 读取映射值
+    println(site.name)
+    println(site.url)
+}
+```
+
+如果使用var属性，需要把Map换成MutableMap
+```
+class Site(val map: MutableMap<String, Any?>) {
+    val name: String by map
+    val url: String by map
+}
+
+fun main(args: Array<String>) {
+
+    var map:MutableMap<String, Any?> = mutableMapOf(
+            "name" to "菜鸟教程",
+            "url" to "www.runoob.com"
+    )
+
+    val site = Site(map)
+
+    println(site.name)
+    println(site.url)
+
+    println("--------------")
+    map.put("name", "Google")
+    map.put("url", "www.google.com")
+
+    println(site.name)
+    println(site.url)
+
+}
+```
+
+### Not Null
+notNull适用于那些无法在初始化阶段就确定属性值的场合
+```
+class Foo{
+  var notNullBar:String by Delegates.notNull<String>()
+}
+foo.notNullBar = "bar"
+println(foo.notNullBar)
+```
+> 如果属性在赋值前就被访问则会抛出异常
+
+### 局部委托属性
+我们可以将局部变量生命成委托属性
+```
+fun example(computeFoo: () -> Foo) {
+    val memoizedFoo by lazy(computeFoo)
+
+    if (someCondition && memoizedFoo.isValid()) {
+        memoizedFoo.doSomething()
+    }
+}
+```
+> memoizedFoo 变量只会在第一次访问时计算。 如果 someCondition 失败，那么该变量根本不会计算。
 
