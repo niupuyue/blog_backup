@@ -1,22 +1,22 @@
 ---
-title: 重拾android路(十二) material design
+title: éćžandroidčˇŻ(ĺäş) material design
 date: 2016-07-20 23:29:10
 tags:
  - Android
 ---
 
-在Google I/O 2015大会中，Google为Android开发者介绍了Design Support Library。这个library可以让开发者很容易地实现更多Material Design概念到他们的应用中，因为很多关键元素是不可用的在原来的框架外。首先就是很易于使用，Design Support Library向下兼容到API 7。Design Support Library可以引入到你的Android工程中通过导入Gradle依赖.
+ĺ¨Google I/O 2015ĺ¤§äźä¸­ďźGoogleä¸şAndroidĺźĺčäťçťäşDesign Support Libraryăčżä¸ŞlibraryĺŻäťĽčŽŠĺźĺčĺžĺŽšćĺ°ĺŽç°ć´ĺ¤Material DesignćŚĺżľĺ°äťäťŹçĺşç¨ä¸­ďźĺ ä¸şĺžĺ¤ĺłéŽĺç´ ćŻä¸ĺŻç¨çĺ¨ĺćĽçćĄćśĺ¤ăéŚĺĺ°ąćŻĺžćäşä˝żç¨ďźDesign Support Libraryĺä¸ĺźĺŽšĺ°API 7ăDesign Support LibraryĺŻäťĽĺźĺĽĺ°ä˝ çAndroidĺˇĽç¨ä¸­éčżĺŻźĺĽGradleäžčľ.
 <!--more-->
-而在Google官网中的<a href='https://developer.android.com/reference/android/support/design/widget/package-summary.html'>android.support.design.widget</a>中，详细描述了这个几个组件(版本以24.1.0为准)
-注释
+čĺ¨GoogleĺŽç˝ä¸­ç<a href='https://developer.android.com/reference/android/support/design/widget/package-summary.html'>android.support.design.widget</a>ä¸­ďźčŻŚçťćčż°äşčżä¸Şĺ ä¸Şçťäťś(çćŹäťĽ24.1.0ä¸şĺ)
+ćł¨é
 
-| 注释名称 | 原文描述 |
+| ćł¨éĺç§° | ĺććčż° |
 |---|---|
 | CoordinatorLayout.DefaultBehavior	| Defines the default CoordinatorLayout.Behavior of a View class. |
 
-类
+çąť
 
-| 组件名称 | 原文描述 |
+| çťäťśĺç§° | ĺććčż° |
 |--------- |:----------------------- :|
 | AppBarLayout | AppBarLayout is a vertical LinearLayout which implements many of the features of material designs app bar concept, namely scrolling gestures. |
 | AppBarLayout.Behavior  | The default AppBarLayout.Behavior for AppBarLayout. |
@@ -38,14 +38,14 @@ tags:
 | TextInputEditText | 	A special sub-class of EditText designed for use as a child of TextInputLayout |
 | TextInputLayout | Layout which wraps an EditText (or descendant) to show a floating label when the hint is hidden due to the user inputting text. |
 
-如果需要使用这些新引入的组件样式，需要加入新的依赖
+ĺŚćéčŚä˝żç¨čżäşć°ĺźĺĽççťäťść ˇĺźďźéčŚĺ ĺĽć°çäžčľ
 
 ```
 compile 'com.android.support:design:22.2.0'
 ```
 
 # Material Text Input
-EditText自从最开始就已经在Android中了，并且使用很简单，他们一直没有什么改变。使用Design Support Library，Google已经介绍了新的包含容器叫作TextInputLayout。这个新的view添加功能到标准的EditText上，例如支持让你的用户界面弹出错误消息和动画提示
+EditTextčŞäťćĺźĺ§ĺ°ąĺˇ˛çťĺ¨Androidä¸­äşďźĺšśä¸ä˝żç¨ĺžçŽĺďźäťäťŹä¸ç´ć˛Ąćäťäšćšĺăä˝żç¨Design Support LibraryďźGoogleĺˇ˛çťäťçťäşć°çĺĺŤĺŽšĺ¨ĺŤä˝TextInputLayoutăčżä¸Şć°çviewćˇťĺ ĺč˝ĺ°ć ĺçEditTextä¸ďźäžĺŚćŻćčŽŠä˝ çç¨ćˇçé˘ĺźšĺşéčŻŻćśćŻĺĺ¨çťćç¤ş
 ```
 <android.support.design.widget.TextInputLayout
     android:id="@+id/textinput"
@@ -61,14 +61,14 @@ EditText自从最开始就已经在Android中了，并且使用很简单，他�
 </android.support.design.widget.TextInputLayout>
 ```
 # SnackBar
-SnackBar通过在屏幕底部展示简洁的信息，为一个操作提供了一个轻量级的反馈，并且在Snackbar中还可以包含一个操作，在同一时间内，仅且只能显示一个 Snackbar，它的显示依赖于UI，不像Toast那样可以脱离应用显示。它的用法和Toast很相似，唯一不同的就是它的第一个参数不是传入Context而是传入它所依附的父视图，但是他比Toast更强大。
-示例：
+SnackBaréčżĺ¨ĺąĺšĺşé¨ĺąç¤şçŽć´çäżĄćŻďźä¸şä¸ä¸Şćä˝ćäžäşä¸ä¸Şč˝ťéçş§çĺéŚďźĺšśä¸ĺ¨Snackbarä¸­čżĺŻäťĽĺĺŤä¸ä¸Şćä˝ďźĺ¨ĺä¸ćśé´ĺďźäťä¸ĺŞč˝ćžç¤şä¸ä¸Ş SnackbarďźĺŽçćžç¤şäžčľäşUIďźä¸ĺToastéŁć ˇĺŻäťĽčąçŚťĺşç¨ćžç¤şăĺŽçç¨ćłĺToastĺžç¸äźźďźĺŻä¸ä¸ĺçĺ°ąćŻĺŽççŹŹä¸ä¸Şĺć°ä¸ćŻäź ĺĽContextčćŻäź ĺĽĺŽćäžéççśč§ĺžďźä˝ćŻäťćŻToastć´ĺźşĺ¤§ă
+ç¤şäžďź
 ```
-Snackbar.make(rootContainer,"提示信息",Snackbar.LENGTH_SHORT).show()
+Snackbar.make(rootContainer,"ćç¤şäżĄćŻ",Snackbar.LENGTH_SHORT).show()
 ```
-效果
-![material design SnackBar效果](/assets/material/materialdesign01.png)
-SnackBar的显示效果和Toas的样式基本相同.不同之处在于，我们可以为当前的SnackBar提供一个点击之后需要执行的Action。
+ćć
+![material design SnackBarćć](/assets/material/materialdesign01.png)
+SnackBarçćžç¤şććĺToasçć ˇĺźĺşćŹç¸ĺ.ä¸ĺäšĺ¤ĺ¨äşďźćäťŹĺŻäťĽä¸şĺ˝ĺçSnackBarćäžä¸ä¸ŞçšĺťäšĺéčŚć§čĄçActionă
 `
 Snackbar.make(mDrawerLayout, "SnackbarClicked", Snackbar.LENGTH_SHORT).setAction("Action", new View.OnClickListener() {
 @Override
@@ -77,16 +77,16 @@ Toast.makeText(MainActivity.this, "I'm a Toast", Toast.LENGTH_SHORT).show();
 }
 }).setActionTextColor(Color.RED).show();
 `
-这是我们为SnackBar设置了一个Action，并且设置了颜色是红色。并且为他设置了点击事件。
+čżćŻćäťŹä¸şSnackBarčŽžç˝Žäşä¸ä¸ŞActionďźĺšśä¸čŽžç˝Žäşé˘č˛ćŻçş˘č˛ăĺšśä¸ä¸şäťčŽžç˝Žäşçšĺťäşäťśă
 # FloatingActionButton
-FloatingActionButton从名字可以看出它是一个浮动的按钮，它是一个带有阴影的圆形按钮，可以通过fabSize来改变其大小，主要负责界面的基本操作，这个按钮总体来说还是比较简单的。
-1. 默认FloatingActionButton 的背景色是应用主题的 colorAccent（其实MD中的控件主题默认基本都是应用的这个主题），可以通过app:backgroundTint 属性或者setBackgroundTintList (ColorStateList tint)方法去改变背景颜色。
-2. 上面提到 Floating action button 的大小尺寸，可以用过**app:fabSize **属性设置（normal or mini）
-3. app:rippleColor 表示设置样式(如水波纹)
-4. app:borderWidth: 设置边框宽度
-5. app:elevation设置普通状态阴影的深度（默认是 6dp）
-6. app:pressedTranslationZ设置点击状态的阴影深度（默认是 12dp）
-7. android:src 属性改变 drawable
+FloatingActionButtonäťĺĺ­ĺŻäťĽçĺşĺŽćŻä¸ä¸ŞćľŽĺ¨çćéŽďźĺŽćŻä¸ä¸Şĺ¸Śćé´ĺ˝ąçĺĺ˝˘ćéŽďźĺŻäťĽéčżfabSizećĽćšĺĺśĺ¤§ĺ°ďźä¸ťčŚč´č´Łçé˘çĺşćŹćä˝ďźčżä¸ŞćéŽćťä˝ćĽčŻ´čżćŻćŻčžçŽĺçă
+1. éťčŽ¤FloatingActionButton çčćŻč˛ćŻĺşç¨ä¸ťé˘ç colorAccentďźĺśĺŽMDä¸­çć§äťśä¸ťé˘éťčŽ¤ĺşćŹé˝ćŻĺşç¨çčżä¸Şä¸ťé˘ďźďźĺŻäťĽéčżapp:backgroundTint ĺąć§ćčsetBackgroundTintList (ColorStateList tint)ćšćłĺťćšĺčćŻé˘č˛ă
+2. ä¸é˘ćĺ° Floating action button çĺ¤§ĺ°ĺ°şĺŻ¸ďźĺŻäťĽç¨čż**app:fabSize **ĺąć§čŽžç˝Žďźnormal or miniďź
+3. app:rippleColor čĄ¨ç¤şčŽžç˝Žć ˇĺź(ĺŚć°´ćł˘çşš)
+4. app:borderWidth: čŽžç˝ŽčžšćĄĺŽ˝ĺşŚ
+5. app:elevationčŽžç˝ŽćŽéçśćé´ĺ˝ąçćˇąĺşŚďźéťčŽ¤ćŻ 6dpďź
+6. app:pressedTranslationZčŽžç˝Žçšĺťçśćçé´ĺ˝ąćˇąĺşŚďźéťčŽ¤ćŻ 12dpďź
+7. android:src ĺąć§ćšĺ drawable
 ```
 <android.support.design.widget.FloatingActionButton
 android:id="@+id/fab_search"
@@ -100,12 +100,12 @@ app:fabSize="normal"
 app:rippleColor="#ff0000" />
 ```
 # coordinatorLayout
-是一个增强版的frameLayout，他可以协调子View之间的交互，从而达到控制手势效果
-效果如下图所示：
-![coordinatorLayout的使用](/assets/material/simple_coordinator.gif)
-在这个例子中我们可以看到View之间是如何相互配合的，View会根据其他View的变动做相应的变化。
+ćŻä¸ä¸Şĺ˘ĺźşççframeLayoutďźäťĺŻäťĽĺč°ĺ­Viewäšé´çäş¤äşďźäťččžžĺ°ć§ĺśćĺżćć
+ććĺŚä¸ĺžćç¤şďź
+![coordinatorLayoutçä˝żç¨](/assets/material/simple_coordinator.gif)
+ĺ¨čżä¸Şäžĺ­ä¸­ćäťŹĺŻäťĽçĺ°Viewäšé´ćŻĺŚä˝ç¸äşéĺçďźViewäźć šćŽĺśäťViewçĺĺ¨ĺç¸ĺşçĺĺă
 
-下面是CoordinatorLayout的简单使用例子
+ä¸é˘ćŻCoordinatorLayoutççŽĺä˝żç¨äžĺ­
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
@@ -175,8 +175,8 @@ app:rippleColor="#ff0000" />
         />
 </android.support.design.widget.CoordinatorLayout>
 ```
-我们看一下这个layout结构，CoordinatorLayout包含3个子控件：
-AppbarLayout， scrolleable view 和 anchoredFloatingActionBar。
+ćäťŹçä¸ä¸čżä¸ŞlayoutçťćďźCoordinatorLayoutĺĺŤ3ä¸Şĺ­ć§äťśďź
+AppbarLayoutďź scrolleable view ĺ anchoredFloatingActionBară
 ```
 <CoordinatorLayout>
     <AppbarLayout/>
@@ -185,23 +185,23 @@ AppbarLayout， scrolleable view 和 anchoredFloatingActionBar。
 </CoordinatorLayout>
 ```
 ## AppBarLayout
-AppBarLayout是一个继承于LinearLayout的ViewGroup的实现，默认AppBarLayout的方向是垂直方向，可以管理内部组件在页面滚动时的行为
-可能语言叙述不是那么的清晰，看一下官方提供的gif图片
-![AppBarLayout的官方实现动图](/assets/material/gif01.gif)
-AppBarLayout在这个例子中时蓝色的View，在其下放置了一个可以缩放的图片，其中包含一个Toolbar，
-一个LinearLayout（包含标题和副标题），以及一个TabLayout。
-我们可以通过设置layout_scrollFlags参数，来控制AppBarLayout中的控件行为。
-在我们的这个例子中，大部分View的layout_scrollFlags都设置为scroll，如果没有设置的话，
-当可滚动的View进行滚动时，这些没设置为scroll的View位置会保持不变；
+AppBarLayoutćŻä¸ä¸Şçť§ćżäşLinearLayoutçViewGroupçĺŽç°ďźéťčŽ¤AppBarLayoutçćšĺćŻĺç´ćšĺďźĺŻäťĽçŽĄçĺé¨çťäťśĺ¨éĄľé˘ćťĺ¨ćśçčĄä¸ş
+ĺŻč˝čŻ­č¨ĺčż°ä¸ćŻéŁäšçć¸ć°ďźçä¸ä¸ĺŽćšćäžçgifĺžç
+![AppBarLayoutçĺŽćšĺŽç°ĺ¨ĺž](/assets/material/gif01.gif)
+AppBarLayoutĺ¨čżä¸Şäžĺ­ä¸­ćśčč˛çViewďźĺ¨ĺśä¸ćžç˝Žäşä¸ä¸ŞĺŻäťĽçźŠćžçĺžçďźĺśä¸­ĺĺŤä¸ä¸ŞToolbarďź
+ä¸ä¸ŞLinearLayoutďźĺĺŤć é˘ĺĺŻć é˘ďźďźäťĽĺä¸ä¸ŞTabLayoută
+ćäťŹĺŻäťĽéčżčŽžç˝Žlayout_scrollFlagsĺć°ďźćĽć§ĺśAppBarLayoutä¸­çć§äťśčĄä¸şă
+ĺ¨ćäťŹçčżä¸Şäžĺ­ä¸­ďźĺ¤§é¨ĺViewçlayout_scrollFlagsé˝čŽžç˝Žä¸şscrollďźĺŚćć˛ĄćčŽžç˝ŽçčŻďź
+ĺ˝ĺŻćťĺ¨çViewčżčĄćťĺ¨ćśďźčżäşć˛ĄčŽžç˝Žä¸şscrollçViewä˝ç˝Žäźäżćä¸ĺďź
 
-layout_scrollFlags设置上snap值则可以避免进入动画中间状态（ mid-animation-states），
-这意味着动画会一直持续到View完全显示或完全隐藏为止。
+layout_scrollFlagsčŽžç˝Žä¸snapĺźĺĺŻäťĽéżĺčżĺĽĺ¨çťä¸­é´çśćďź mid-animation-statesďźďź
+čżćĺłçĺ¨çťäźä¸ç´ćçť­ĺ°ViewĺŽĺ¨ćžç¤şćĺŽĺ¨éčä¸şć­˘ă
 
-LinearLayout其中包含了一个标题和一个副标题，当用户向上移动时LinearLayout是一直显示的，直到移出屏幕（enterAlways）;
+LinearLayoutĺśä¸­ĺĺŤäşä¸ä¸Şć é˘ĺä¸ä¸ŞĺŻć é˘ďźĺ˝ç¨ćˇĺä¸ç§ťĺ¨ćśLinearLayoutćŻä¸ç´ćžç¤şçďźç´ĺ°ç§ťĺşĺąĺšďźenterAlwaysďź;
 
-TabLayout会一直是可见的，因为我们没有在TabLayout上设置任何flag。
+TabLayoutäźä¸ç´ćŻĺŻč§çďźĺ ä¸şćäťŹć˛Ąćĺ¨TabLayoutä¸čŽžç˝Žäťťä˝flagă
 
-正如你所见，AppbarLayout的强大管理能力是通过在View上设置不同scroll flags实现的。
+ć­ŁĺŚä˝ ćč§ďźAppbarLayoutçĺźşĺ¤§çŽĄçč˝ĺćŻéčżĺ¨Viewä¸čŽžç˝Žä¸ĺscroll flagsĺŽç°çă
 ```
 <AppBarLayout>
     <CollapsingToolbarLayout
@@ -217,21 +217,21 @@ TabLayout会一直是可见的，因为我们没有在TabLayout上设置任何fl
     <TabLayout /> <!-- no flags -->
 </AppBarLayout>
 ```
-下面AppBarLayout的flags：
+ä¸é˘AppBarLayoutçflagsďź
 
-| 取值 | 说明 |
+| ĺĺź | čŻ´ć |
 |------|------|
-|SCROLL_FLAG_ENTER_ALWAYS | 当任何向下滚动事件发生时, View都会移入 , 不管scrolling view 是否正在滚动。|
-|SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED | ‘enterAlways’的附加标识，它使得returning view恢复到指定的最小高度后才开始显示，然后再慢慢展开。|
-|SCROLL_FLAG_EXIT_UNTIL_COLLAPSED | 但向上移出屏幕时，View会一直收缩到最小高度后，再移出屏幕。|
-|SCROLL_FLAG_SCROLL | View 会根据滚动事件进行移动。|
-|SCROLL_FLAG_SNAP | 但滚动结束时，如果View只有部分可见，它将会自动滑动到最近的边界（完全可见或完全隐藏）|
+|SCROLL_FLAG_ENTER_ALWAYS | ĺ˝äťťä˝ĺä¸ćťĺ¨äşäťśĺçćś, Viewé˝äźç§ťĺĽ , ä¸çŽĄscrolling view ćŻĺŚć­Łĺ¨ćťĺ¨ă|
+|SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED | âenterAlwaysâçéĺ ć čŻďźĺŽä˝żĺžreturning viewć˘ĺ¤ĺ°ćĺŽçćĺ°éŤĺşŚĺćĺźĺ§ćžç¤şďźçśĺĺć˘ć˘ĺąĺźă|
+|SCROLL_FLAG_EXIT_UNTIL_COLLAPSED | ä˝ĺä¸ç§ťĺşĺąĺšćśďźViewäźä¸ç´ćśçźŠĺ°ćĺ°éŤĺşŚĺďźĺç§ťĺşĺąĺšă|
+|SCROLL_FLAG_SCROLL | View äźć šćŽćťĺ¨äşäťśčżčĄç§ťĺ¨ă|
+|SCROLL_FLAG_SNAP | ä˝ćťĺ¨çťććśďźĺŚćViewĺŞćé¨ĺĺŻč§ďźĺŽĺ°äźčŞĺ¨ćťĺ¨ĺ°ćčżçčžšçďźĺŽĺ¨ĺŻč§ćĺŽĺ¨éčďź|
 
 ## CoordinatorLayout behavior
 ### SwipeDismissBehavior
-深入design support library的代码，我们会发现一个新的类：SwipeDismissBehavior，使用这个Behavior，
-我们可以很容易的使用CoordinatorLayout实现滑动删除功能:
-![演示](/assets/material/coordinator03.gif)
+ćˇąĺĽdesign support libraryçäťŁç ďźćäťŹäźĺç°ä¸ä¸Şć°ççąťďźSwipeDismissBehaviorďźä˝żç¨čżä¸ŞBehaviorďź
+ćäťŹĺŻäťĽĺžĺŽšćçä˝żç¨CoordinatorLayoutĺŽç°ćťĺ¨ĺ é¤ĺč˝:
+![ćźç¤ş](/assets/material/coordinator03.gif)
 ```
 @Override
 public void onCreate(Bundle savedInstanceState) {
@@ -257,18 +257,18 @@ public void onCreate(Bundle savedInstanceState) {
     }
 ```
 ### custom Behavior
-除了上面的这种之外，我们还可以自定义。首先我们应该搞清楚两个核心child和dependency
-![演示](/assets/material/coordinator04.png)
-#### child 和 dependency
-child 是指需要应用behavior的View ，dependency 担任触发behavior的角色，并与child进行互动。
-在这个例子中， child 是ImageView， dependency 是Toolbar，如果Toolbar发生移动，ImageView也会做相应的移动。
+é¤äşä¸é˘çčżç§äšĺ¤ďźćäťŹčżĺŻäťĽčŞĺŽäšăéŚĺćäťŹĺşčŻĽćć¸ćĽä¸¤ä¸Şć ¸ĺżchildĺdependency
+![ćźç¤ş](/assets/material/coordinator04.png)
+#### child ĺ dependency
+child ćŻćéčŚĺşç¨behaviorçView ďźdependency ćäťťč§Śĺbehaviorçč§č˛ďźĺšśä¸childčżčĄäşĺ¨ă
+ĺ¨čżä¸Şäžĺ­ä¸­ďź child ćŻImageViewďź dependency ćŻToolbarďźĺŚćToolbarĺçç§ťĺ¨ďźImageViewäšäźĺç¸ĺşçç§ťĺ¨ă
 ![](assets/android_material_design/coordinator05.gif)
-现在我们已经知道概念了，接着我们看看怎么实现，
-第一步我们需要继承CoordinatorLayout.Behavior，T是指某一个View，
-在我们的例子中是ImageView， 继承后，我们必须实现以下2个方法:
+ç°ĺ¨ćäťŹĺˇ˛çťçĽéćŚĺżľäşďźćĽçćäťŹççćäšĺŽç°ďź
+çŹŹä¸ć­ĽćäťŹéčŚçť§ćżCoordinatorLayout.BehaviorďźTćŻććä¸ä¸ŞViewďź
+ĺ¨ćäťŹçäžĺ­ä¸­ćŻImageViewďź çť§ćżĺďźćäťŹĺżéĄťĺŽç°äťĽä¸2ä¸Şćšćł:
 - layoutDependsOn
 - onDependentViewChanged
-layoutDependsOn方法在每次layout发生变化时都会调用，我们需要在dependency控件发生变化时返回True，在我们的例子中是用户在屏幕上滑动时（因为Toolbar发生了移动），然后我们需要让child做出相应的反应。
+layoutDependsOnćšćłĺ¨ćŻćŹĄlayoutĺçĺĺćśé˝äźč°ç¨ďźćäťŹéčŚĺ¨dependencyć§äťśĺçĺĺćśčżĺTrueďźĺ¨ćäťŹçäžĺ­ä¸­ćŻç¨ćˇĺ¨ĺąĺšä¸ćťĺ¨ćśďźĺ ä¸şToolbarĺçäşç§ťĺ¨ďźďźçśĺćäťŹéčŚčŽŠchildĺĺşç¸ĺşçĺĺşă
 ```
 @Override
   public boolean layoutDependsOn(     
@@ -278,8 +278,8 @@ layoutDependsOn方法在每次layout发生变化时都会调用，我们需要�
      return dependency instanceof Toolbar;
  }
  ```
- 一旦layoutDependsOn返回了True，第二个方法onDependentViewChanged就会被调用，
-在这个方法里我们需要实现动画，转场等效果。
+ ä¸ćŚlayoutDependsOnčżĺäşTrueďźçŹŹäşä¸ŞćšćłonDependentViewChangedĺ°ąäźč˘Ťč°ç¨ďź
+ĺ¨čżä¸ŞćšćłéćäťŹéčŚĺŽç°ĺ¨çťďźč˝Źĺşç­ććă
 ```
 public boolean onDependentViewChanged(
       CoordinatorLayout parent,
@@ -293,7 +293,7 @@ public boolean onDependentViewChanged(
         //  avatar.setBlahBlat(dependency.blah / blah);
     }
 ```
-整合之后的代码是：
+ć´ĺäšĺçäťŁç ćŻďź
 ```
 public static class AvatarImageBehavior
    extends CoordinatorLayout.Behavior<CircleImageView> {
@@ -317,11 +317,11 @@ public static class AvatarImageBehavior
     }    
 }
 ```
-几个写好的小栗子🌰，供大家参考
+ĺ ä¸ŞĺĺĽ˝çĺ°ć ĺ­đ°ďźäžĺ¤§ĺŽśĺč
 
 
 # NavigationView
-这个其实就是侧滑栏，之前有自己写过一个侧滑栏，但是功能比较单一，而且写了好多，感觉在实现回调等操作的时候，比较复杂。不过之后就是用了官方的NavigationView，确实比较好用
+čżä¸ŞĺśĺŽĺ°ąćŻäž§ćťć ďźäšĺćčŞĺˇąĺčżä¸ä¸Şäž§ćťć ďźä˝ćŻĺč˝ćŻčžĺä¸ďźčä¸ĺäşĺĽ˝ĺ¤ďźćč§ĺ¨ĺŽç°ĺč°ç­ćä˝çćśĺďźćŻčžĺ¤ćăä¸čżäšĺĺ°ąćŻç¨äşĺŽćšçNavigationViewďźçĄŽĺŽćŻčžĺĽ˝ç¨
 ```
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -330,7 +330,7 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:fitsSystemWindows="true">
 
-<!--内容区-->
+<!--ĺĺŽšĺş-->
 <android.support.design.widget.CoordinatorLayout
     android:id="@+id/main_content"
     android:layout_width="match_parent"
@@ -349,7 +349,7 @@ android:fitsSystemWindows="true">
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 </android.support.design.widget.CoordinatorLayout>
 
-<!--左侧导航菜单-->
+<!--ĺˇŚäž§ĺŻźčŞčĺ-->
 <android.support.design.widget.NavigationView
     android:id="@+id/navigation_view"
     android:layout_width="wrap_content"
@@ -359,7 +359,7 @@ android:fitsSystemWindows="true">
     app:menu="@menu/drawer" />
 </android.support.v4.widget.DrawerLayout>
 ```
-可以看到这里我们是以DrawerLayout作为其父布局，对于DrawLayout他可以实现一种抽屉式的侧滑效果，这里不多做讲解,这里只简单说一点:DrawLayout中的第一个布局是内容布局，第二个是菜单布局。现在我们直接定位到NavigationView，我们看到这里有** app:headerLayout="@layout/navigation_header"、app:menu="@menu/drawer"**这两行代码，其中headerLayout是设置其头部的布局，这个布局我们可以随便写，就和写普通的布局文件一样的。对于menu就是菜单项的配置了，其配置文件如下
+ĺŻäťĽçĺ°čżéćäťŹćŻäťĽDrawerLayoutä˝ä¸şĺśçśĺ¸ĺąďźĺŻšäşDrawLayoutäťĺŻäťĽĺŽç°ä¸ç§ć˝ĺąĺźçäž§ćťććďźčżéä¸ĺ¤ĺčŽ˛č§Ł,čżéĺŞçŽĺčŻ´ä¸çš:DrawLayoutä¸­ççŹŹä¸ä¸Şĺ¸ĺąćŻĺĺŽšĺ¸ĺąďźçŹŹäşä¸ŞćŻčĺĺ¸ĺąăç°ĺ¨ćäťŹç´ćĽĺŽä˝ĺ°NavigationViewďźćäťŹçĺ°čżéć** app:headerLayout="@layout/navigation_header"ăapp:menu="@menu/drawer"**čżä¸¤čĄäťŁç ďźĺśä¸­headerLayoutćŻčŽžç˝Žĺśĺ¤´é¨çĺ¸ĺąďźčżä¸Şĺ¸ĺąćäťŹĺŻäťĽéäžżĺďźĺ°ąĺĺćŽéçĺ¸ĺąćäťśä¸ć ˇçăĺŻšäşmenuĺ°ąćŻčĺéĄšçéç˝Žäşďźĺśéç˝ŽćäťśĺŚä¸
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -369,20 +369,20 @@ tools:context=".MainActivity">
 <item
 android:id="@+id/navigation_item_home"
 android:icon="@drawable/iconfont_home"
-android:title="首页" />
+android:title="éŚéĄľ" />
 <item
 android:id="@+id/navigation_item_blog"
 android:icon="@drawable/iconfont_blog"
-android:title="我的博客" />
+android:title="ćçĺĺŽ˘" />
 
     <item
         android:id="@+id/navigation_item_about"
         android:icon="@drawable/iconfont_about"
-        android:title="关于" />
+        android:title="ĺłäş" />
 </group>
 </menu>
 ```
-就这么简单，我们要实现上述的效果就只要这些就足够了。但是如果我们想要对Item添加一个点击的事件怎么做呢？请看下面：
+ĺ°ąčżäšçŽĺďźćäťŹčŚĺŽç°ä¸čż°çććĺ°ąĺŞčŚčżäşĺ°ąčśłĺ¤äşăä˝ćŻĺŚććäťŹćłčŚĺŻšItemćˇťĺ ä¸ä¸Şçšĺťçäşäťśćäšĺĺ˘ďźčŻˇçä¸é˘ďź
 ```
 private void setNavigationViewItemClickListener() {
 mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -390,15 +390,15 @@ mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigatio
 public boolean onNavigationItemSelected(MenuItem item) {
 switch (item.getItemId()) {
 case R.id.navigation_item_home:
-mToolbar.setTitle("首页");
+mToolbar.setTitle("éŚéĄľ");
 switchFragment("MainFragment");
 break;
 case R.id.navigation_item_blog:
-mToolbar.setTitle("我的博客");
+mToolbar.setTitle("ćçĺĺŽ˘");
 switchFragment("BlogFragment");
 break;
 case R.id.navigation_item_about:
-mToolbar.setTitle("关于");
+mToolbar.setTitle("ĺłäş");
 switchFragment("AboutFragment");
 break;
 default:
@@ -411,10 +411,10 @@ return false;
 });
 }
 ```
-上面的代码很清楚了，就是为NavigationView添加了一个OnNavigationItemSelectedListener的监听事件，然后我们就可以做我们想做的事了
+ä¸é˘çäťŁç ĺžć¸ćĽäşďźĺ°ąćŻä¸şNavigationViewćˇťĺ äşä¸ä¸ŞOnNavigationItemSelectedListenerççĺŹäşäťśďźçśĺćäťŹĺ°ąĺŻäťĽĺćäťŹćłĺçäşäş
 
 
-# 参考资料
-[android的](http://www.jcodecraeer.com/a/anzhuokaifa/developer/2015/0531/2958.html)
-[掌握coordinatorLayout](https://appkfz.com/2015/11/12/mastering-coordinator/?hmsr=toutiao.io)
-[名字很长不知道该怎么翻译😆](https://lab.getbase.com/introduction-to-coordinator-layout-on-android/)
+# ĺččľć
+[androidç](http://www.jcodecraeer.com/a/anzhuokaifa/developer/2015/0531/2958.html)
+[ććĄcoordinatorLayout](https://appkfz.com/2015/11/12/mastering-coordinator/?hmsr=toutiao.io)
+[ĺĺ­ĺžéżä¸çĽéčŻĽćäšçżťčŻđ](https://lab.getbase.com/introduction-to-coordinator-layout-on-android/)
