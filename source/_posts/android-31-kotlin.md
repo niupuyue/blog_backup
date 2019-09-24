@@ -2171,3 +2171,94 @@ fun example(computeFoo: () -> Foo) {
 ```
 > memoizedFoo 变量只会在第一次访问时计算。 如果 someCondition 失败，那么该变量根本不会计算。
 
+#### 属性委托要求
+对于只读属性(val属性)，他的委托必须提供一个名为getValue的函数，该函数接收一下参数：
+1. thisRef---必须与属性所有者类型(对于扩展属性---指被扩展的类型)相同或者是他的超类
+2. property---必须是类型KProperty<*>或者其超类
+
+这个函数必须返回与属性相同的类型(或者子类)
+对于一个值可变(mutable)属性(var属性),除了getValue函数之外，他的委托还必须另外再提供一个名为setValue的函数,接收一下参数
+1. property---必须是类型KProperty<*>或其超类
+2. new value---必须和属性同类型或者是他的超类
+
+#### 翻译规则
+在每个委托属性的实现的背后，Kotlin 编译器都会生成辅助属性并委托给它。 例如，对于属性 prop，生成隐藏属性 prop$delegate，而访问器的代码只是简单地委托给这个附加属性：
+```
+class C {
+    var prop: Type by MyDelegate()
+}
+
+// 这段是由编译器生成的相应代码：
+class C {
+    private val prop$delegate = MyDelegate()
+    var prop: Type
+        get() = prop$delegate.getValue(this, this::prop)
+        set(value: Type) = prop$delegate.setValue(this, this::prop, value)
+}
+```
+Kotlin 编译器在参数中提供了关于 prop 的所有必要信息：第一个参数 this 引用到外部类 C 的实例而 this::prop 是 KProperty 类型的反射对象，该对象描述 prop 自身。
+
+#### 提供委托
+通过定义 provideDelegate 操作符，可以扩展创建属性实现所委托对象的逻辑。 如果 by 右侧所使用的对象将 provideDelegate 定义为成员或扩展函数，那么会调用该函数来 创建属性委托实例。
+
+provideDelegate 的一个可能的使用场景是在创建属性时（而不仅在其 getter 或 setter 中）检查属性一致性。
+
+例如，如果要在绑定之前检查属性名称，可以这样写：
+```
+class ResourceLoader<T>(id: ResourceID<T>) {
+    operator fun provideDelegate(
+            thisRef: MyUI,
+            prop: KProperty<*>
+    ): ReadOnlyProperty<MyUI, T> {
+        checkProperty(thisRef, prop.name)
+        // 创建委托
+    }
+
+    private fun checkProperty(thisRef: MyUI, name: String) { …… }
+}
+
+fun <T> bindResource(id: ResourceID<T>): ResourceLoader<T> { …… }
+
+class MyUI {
+    val image by bindResource(ResourceID.image_id)
+    val text by bindResource(ResourceID.text_id)
+}
+```
+provideDelegate 的参数与 getValue 相同：
+
+1. thisRef —— 必须与 属性所有者 类型（对于扩展属性——指被扩展的类型）相同或者是它的超类型
+2. property —— 必须是类型 KProperty<*> 或其超类型。
+在创建 MyUI 实例期间，为每个属性调用 provideDelegate 方法，并立即执行必要的验证。
+
+如果没有这种拦截属性与其委托之间的绑定的能力，为了实现相同的功能， 你必须显式传递属性名，这不是很方便：
+```
+// 检查属性名称而不使用“provideDelegate”功能
+class MyUI {
+    val image by bindResource(ResourceID.image_id, "image")
+    val text by bindResource(ResourceID.text_id, "text")
+}
+
+fun <T> MyUI.bindResource(
+        id: ResourceID<T>,
+        propertyName: String
+): ReadOnlyProperty<MyUI, T> {
+   checkProperty(this, propertyName)
+   // 创建委托
+}
+```
+在生成的代码中，会调用 provideDelegate 方法来初始化辅助的 prop$delegate 属性。 比较对于属性声明 val prop: Type by MyDelegate() 生成的代码与 上面（当 provideDelegate 方法不存在时）生成的代码：
+```
+class C {
+    var prop: Type by MyDelegate()
+}
+
+// 这段代码是当“provideDelegate”功能可用时
+// 由编译器生成的代码：
+class C {
+    // 调用“provideDelegate”来创建额外的“delegate”属性
+    private val prop$delegate = MyDelegate().provideDelegate(this, this::prop)
+    val prop: Type
+        get() = prop$delegate.getValue(this, this::prop)
+}
+```
+请注意，provideDelegate 方法只影响辅助属性的创建，并不会影响为 getter 或 setter 生成的代码
