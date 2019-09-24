@@ -106,8 +106,14 @@ git merge master(当前分支是dev分支，将master分支上的内容合并到
 ```
 git push origin
 ```
-
-
+4. 查看远程分支
+```
+git remote -v
+```
+5. 更改远程仓库地址
+```
+git remote set-url origin 新地址
+```
 
 # 参考资料
 [git入门](https://github.com/pengMaster/BestNote/blob/master/docs/tools/Git.md#git-%E4%BD%BF%E7%94%A8%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8)
