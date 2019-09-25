@@ -42,6 +42,7 @@ tags:
         }
     }
 ```
+实现起来还是比较简单的，这里我通过自己和在网上搜到的有五种方法，记录一下。
 
 ## 使用handler+postDelayed()
 
@@ -160,11 +161,6 @@ btn03 = findViewById(R.id.btn03);
                         mTvValue.setText(value);
                     }
                 });
-
-作者：PandaQ
-链接：https://juejin.im/post/58bead54ac502e006b2fe6e0
-来源：掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
             }
         });
 ```
