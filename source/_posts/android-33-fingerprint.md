@@ -29,8 +29,28 @@ Android指纹识别，提升App用户体验
 
 
 
+## 指纹识别API的版本演进
+在Android6.0开放了指纹识别API，存在于<p style="color:red">android.hardware.fingerprint</p>包下，核心类是FingerprintManager，提供了基础的指纹识别功能。要注意的是，FingerprintManager在android9.0做了@Deprecated标记，将被弃用
 
+后来，在<p style="color:red">android.support.v4.hardware.fingerprint</p>包和<p style="color:red">androidx.core.hardware.fingerprint</p>包中，<p style="color:red">FngerprintManger</p>升级为<p style="color:red">FingerprintMangerCompat</p>,对功能进行了增强，也做了一些兼容性处理，比如增加了系统版本号的判断，对指纹支持加密处理等，实际上阅读源码我们会发现，其实还是调用了FingerprintManger实现的
 
+再之后，android9.0Google对生物识别进行了进一步增强，开放了以<p style="color:red">BiometricPrompt</p>为核心的新Api，存在于<p style="color:red">androidx.biometric</p>包和<p style="color:red">android.hardware.biometrics</p>包下。这里提供的是支持设备提供的生物识别，包括指纹，虹膜，面部等
+
+### 指纹识别的关键方法 authenticate
+
+这个是指纹识别中最核心的方法，用于拉起指纹识别扫描器进行指纹识别
+以<p style="color:red">FingerprintManagerCompat</p>中的authenticate方法为例，定义如下
+![authenticate定义](/assets/fingerprint/fingerprint_01.png)
+![authenticate定义](/assets/fingerprint/fingerprint_02.png)
+
+参数说明
+1. FingerprintManagerCompat.CrytoObject crypto
+    密码对象包装类，目前支持Signature形式和Cipher形式的密码对象加密
+    作用是，指纹扫描器会使用这个对象判断指纹认证结果的合法性，Android6.0是@Nullable，但不建议传Null，其在Android9.0之后就变成了@NonNull
+2. int flags
+    可选标志，暂无使用的地方，传0即可
+3. CancellationSignal cancel
+    这个对象的作用是用来取消指纹扫描操作的。比如用户点击了识别框上的取消按钮或者密码验证按钮，就要及时取消扫描器的扫描操作.如果不执行的话，会造成好电，而且在超时时间内无法再次唤起指纹识别        
 
 # 参考资料
 
