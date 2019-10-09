@@ -55,6 +55,7 @@ while(days.hasMoreElements()){
 BitSet定义了两个构造方法：BitSet()和BitSet(int size)
 
 BitSet中实现了Cloneable接口中定义的方法，如下所示
+
 |方法|描述|
 |---|---|
 |void and(BitSet set)|对此目标位set和参数位set执行逻辑与操作|
@@ -82,6 +83,7 @@ BitSet中实现了Cloneable接口中定义的方法，如下所示
 |int size()|返回此位set的字符串表示形式|
 |String toString()|返回此位set的字符串表示形式|
 |void xor(BitSet bitSet)|对此位set和位set参数执行逻辑异或操作|
+
 
 ```
 BitSet bits1 = new BitSet(16);
@@ -115,13 +117,16 @@ BitSet bits1 = new BitSet(16);
 
 ## 向量
 Vector类实现了一个动态数组，和ArrayList很相似，但两者有不同
+
 - Vector是同步访问的
 - Vector包含了很多传统方法，这些方法不属于集合框架
+
 Vector主要用在实现不知道数组的大小，或者只是需要一个可以改变大小的数组的情况
 Vector有四个构造方法：Vector(),Vector(int size),Vector(int size,int incr),Vector(Collection c)
 其中Vector(int size)是创建指定大小的向量，Vector(int size,int incr)创建指定大小的向量并且增量用incr指定。增量表示向量每次增加的元素数目
 
 Vector常用方法
+
 |方法|描述|
 |---|---|
 |void add(int index,Object element)|在此向量的指定位置插入指定的元素|
@@ -252,6 +257,7 @@ Dictionary类是一个抽象类，用来存储键值对，作用和Map类似。
 给出键和值，我们可以将只存储早字典对象中，一旦值被存储，就可以通过它的键来获取
 
 字典常用方法
+
 |方法|描述|
 |---|---|
 |Enumeration elements()|返回此字典中值的枚举|
