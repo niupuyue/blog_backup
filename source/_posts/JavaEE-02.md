@@ -9,6 +9,8 @@ tags:
 
 <!--more-->
 
+总之就是查找自己有哪些知识点是掌握不牢固的，有哪些内容是已经忘记了的
+
 # 数据结构
 java工具包提供了强大的数据结构，在java中数据结构主要包括以下几种接口和类
 
@@ -284,6 +286,167 @@ Java泛型是JDK5中引入的新特性，泛型提供了编译时类型安全检
 
 ```
 public class GenericMethodTest{
-  
+  public static <E> void printArray(E[] intputArray){
+    // 输入数组元素
+    for(E element:inputArray){
+      System.out.println("%s",element);
+    }
+    System.out.println();
+  }
+
+  public static void main(String[] args){
+    // 创建不同类型数组： Integer, Double 和 Character
+        Integer[] intArray = { 1, 2, 3, 4, 5 };
+        Double[] doubleArray = { 1.1, 2.2, 3.3, 4.4 };
+        Character[] charArray = { 'H', 'E', 'L', 'L', 'O' };
+ 
+        System.out.println( "整型数组元素为:" );
+        printArray( intArray  ); // 传递一个整型数组
+ 
+        System.out.println( "\n双精度型数组元素为:" );
+        printArray( doubleArray ); // 传递一个双精度型数组
+ 
+        System.out.println( "\n字符型数组元素为:" );
+        printArray( charArray ); // 传递一个字符型数组
+  }
 }
+```
+有界类型参数：
+有时候我们想要限制那些被允许传到一个类型参数的参数类型。例如，我们只想接受一个传递的是Number类型或者是Number类型的子类，那么我们就可以约束成有界参数，实现我们想要的功能：
+```
+public class MaximumTest{
+  // 比较三个值，然后返回最大值
+  public static <T extends Comparable<T>> T maximum(T x,T y,T z){
+    T max = x;
+    if(y.compareTo(max) > 0){
+      // 说明y更大
+      max = y；
+    }
+    if(z.compareTo(max) > 0){
+      // 说明z更大
+      max = z;
+    }
+    return max;
+  }
+
+  public static void main(String [] args){
+    System.out.printf( "%d, %d 和 %d 中最大的数为 %d\n\n",
+                   3, 4, 5, maximum( 3, 4, 5 ) );
+ 
+      System.out.printf( "%.1f, %.1f 和 %.1f 中最大的数为 %.1f\n\n",
+                   6.6, 8.8, 7.7, maximum( 6.6, 8.8, 7.7 ) );
+ 
+      System.out.printf( "%s, %s 和 %s 中最大的数为 %s\n","pear",
+         "apple", "orange", maximum( "pear", "apple", "orange" ) );
+  }
+}
+```
+
+## 泛型类
+泛型类的声明和非泛型类的声明类似，除了在类名后面需要添加类型参数声明部分。
+和泛型方法一样，泛型类的类型参数声明部分也包含了一个或多个类型参数，参数之间用逗号隔开。一个泛型参数也被称为类型变量，是一个用来指定泛型参数类型的标志符。因为他们接受一个或多个参数，这些类被称为参数化类或参数化类性
+
+```
+public class Box<T>{
+  private T t;
+  public void setValue(T t){
+    this.t = t;
+  }
+  public T getValue(){
+    return this.t;
+  }
+  public static void main(String [] args){
+    Box<Integer> box = new Box<Integer>();
+    Box<String> strBox = new Box<String>();
+
+    box.setValue(new Integer(100));
+    strBox.setValue("hello world");
+
+  }
+}
+```
+
+## 类型通配符
+ 
+- 类型通配符通常使用?来代替具体的参数类型，例如List<?>
+
+```
+public class GenericTest {
+     
+    public static void main(String[] args) {
+        List<String> name = new ArrayList<String>();
+        List<Integer> age = new ArrayList<Integer>();
+        List<Number> number = new ArrayList<Number>();
+        
+        name.add("icon");
+        age.add(18);
+        number.add(314);
+ 
+        getData(name);
+        getData(age);
+        getData(number);
+       
+   }
+ 
+   public static void getData(List<?> data) {
+      System.out.println("data :" + data.get(0));
+   }
+}
+```
+
+> 因为getData方法的参数类型是list，所以name，age，number都可以作为方法的实参，这就是通配符的作用
+
+-  类型通配符上限通过形如List来定义，如此定义就是通配符泛型类型接受Number以及子类类型
+
+```
+public class GenericTest {
+     
+    public static void main(String[] args) {
+        List<String> name = new ArrayList<String>();
+        List<Integer> age = new ArrayList<Integer>();
+        List<Number> number = new ArrayList<Number>();
+        
+        name.add("icon");
+        age.add(18);
+        number.add(314);
+ 
+        //getUperNumber(name);//1
+        getUperNumber(age);//2
+        getUperNumber(number);//3
+       
+   }
+ 
+   public static void getData(List<?> data) {
+      System.out.println("data :" + data.get(0));
+   }
+   
+   public static void getUperNumber(List<? extends Number> data) {
+          System.out.println("data :" + data.get(0));
+       }
+}
+```
+
+> 在(//1)处会出现错误，因为getUperNumber()方法中的参数已经限定了参数泛型上限为Number，所以泛型为String是不在这个范围之内，所以会报错
+
+- 类型通配符下限通过形如List<? super Number>来定义，表示只接受Number以及其三层父类型
+
+### 补充
+
+- <? extends T>和<? super T>的区别
+<? extends T>表示泛型只接受T类型或T类型的子类
+<？ super T>表示泛型只接受T类型或T类型的父类
+
+- 对于泛型，只是允许程序员在编译时检测到非法的类型而已。但是在运行期时，其中的泛型标志会变化为 Object 类型。
+```
+List<Integer> list = new ArrayList<>();
+
+list.add(12);
+//这里直接添加会报错
+list.add("a");
+Class<? extends List> clazz = list.getClass();
+Method add = clazz.getDeclaredMethod("add", Object.class);
+//但是通过反射添加，是可以的
+add.invoke(list, "kl");
+
+System.out.println(list)
 ```
