@@ -246,3 +246,124 @@ public void destory(){
 </web-app>
 ```
 
+补充说明：
+destory方法被调用后，servlet被销毁，但是并没有立即回收，再次请求时，并没有重新初始化
+```
+private String message;
+
+@Override
+public void init() throws ServletException {
+    message = "Hello World , Nect To Meet You: " + System.currentTimeMillis();
+    System.out.println("servlet初始化……");
+    super.init();
+}
+
+@Override
+public void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+    response.setContentType("text/html");
+    PrintWriter writer = response.getWriter();
+    writer.write("<h1>" + message + "</h1>");
+    destroy();
+}
+
+@Override
+public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    // TODO Auto-generated method stub
+    super.doPost(req, resp);
+}
+
+@Override
+public void destroy() {
+    System.out.println("servlet销毁！");
+    super.destroy();
+}
+```
+Log日志打印：
+```
+servlet初始化……
+servlet销毁！
+2017-7-6 19:48:52 org.apache.catalina.core.StandardContext reload
+信息: Reloading Context with name [/myServlet] has started
+servlet销毁！
+2017-7-6 19:48:52 org.apache.catalina.core.StandardContext reload
+信息: Reloading Context with name [/myServlet] is completed
+servlet初始化……
+servlet销毁！
+servlet销毁！
+servlet销毁！
+servlet销毁！
+servlet销毁！
+servlet销毁！
+servlet销毁！
+```
+
+Servlet浏览器访问路径配置的小问题
+有两种方式配置路径
+- java 类里的注解 —— @WebServlet("/HelloServlet") 对应浏览器路径
+```
+http://localhost:8080/TomcatTest/HelloServlet
+```
+- 配置文件（web.xml）里对应的浏览器访问路径：
+```
+http://localhost:8080/TomcatTest/TomcatTest/HelloServlet
+```
+两种配置使用一种即可，不然路径重名反而会让tomcat启动不了
+
+## Servlet生命周期
+Servlet生命周期可被定义为冲创建知道毁灭的过程，遵循以下过程
+1. Servlet通过调用init()方法进行初始化
+2. Servlet调用service()方法来处理客户端请求
+3. Servlet通过调用destory()方法终止(结束)
+4. 最后Servlet是由JVM的垃圾回收器进行垃圾回收的
+
+### init()方法
+init方法被设计成只调用一次，在第一次创建该Servlet时被调用，在后续每次用户请求时不再调用，因此它是用一次性初始化
+Servlet创建于用户第一次调用欧冠对象与该Servlet的URL时，但是我们也可以指定Servlet在服务器第一次启动时被加载。当用户调用Servlet时，创建一个Servlet实例，每一个用户请求都会产生新的线程，适当的时候交给doGet或者doPost方法。init方法简单的创建或加载一些数据，这些数据将被用于Servlet的整个生命周期
+init方法的定义如下
+```
+public void init() throws ServletException{
+    // 初始化代码
+}
+```
+### service()方法
+service()方法是执行实际任务的主要方法.Servlet容器(即Web服务器)调用service()方法来处理来自客户端浏览器的请求，并把格式化的响应写回给客户端
+每次服务器接收到一个Servlet请求时，服务器会产生一个新的线程并调用服务。service()方法检查HTTP请求类型(GET,POST,PUT,DELETE等)，并在适当的时候调用相应的方法
+```
+public void service(ServletRequest request, 
+                    ServletResponse response) 
+      throws ServletException, IOException{
+}
+```
+service()方法由容器调用，service方法在适当的时侯调用doGet,doPost,doPut,doDelete等方法，所以，不用对service()方法做任何动作，只需要根据来自客户端的请求类型重写相应的方法即可
+doGet和doPost方法是每次服务请求中最常用的方法，
+#### doGet()方法
+GET 请求来自于一个 URL 的正常请求，或者来自于一个未指定 METHOD 的 HTML 表单，它由 doGet() 方法处理。
+```
+public void doGet(HttpServletRequest request,
+                  HttpServletResponse response)
+    throws ServletException, IOException {
+    // Servlet 代码
+}
+```
+#### doPost()方法
+POST 请求来自于一个特别指定了 METHOD 为 POST 的 HTML 表单，它由 doPost() 方法处理。
+```
+public void doPost(HttpServletRequest request,
+                   HttpServletResponse response)
+    throws ServletException, IOException {
+    // Servlet 代码
+}
+```
+### destory()方法
+destroy() 方法只会被调用一次，在 Servlet 生命周期结束时被调用。destroy() 方法可以让您的 Servlet 关闭数据库连接、停止后台线程、把 Cookie 列表或点击计数器写入到磁盘，并执行其他类似的清理活动。
+
+在调用 destroy() 方法之后，servlet 对象被标记为垃圾回收。destroy 方法定义如下所示：
+```
+  public void destroy() {
+    // 终止化代码...
+  }
+```
+### 架构图
+![Servlet生命周期架构图](/assets/JavaEE/javaweb_02.png)  
+
+## 表单数据
