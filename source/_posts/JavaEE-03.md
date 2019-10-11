@@ -367,3 +367,142 @@ destroy() 方法只会被调用一次，在 Servlet 生命周期结束时被调�
 ![Servlet生命周期架构图](/assets/JavaEE/javaweb_02.png)  
 
 ## 表单数据
+在我们的开发过程中表单是非常常用的一个组件，不管是登录也好，还是搜索，等等。浏览器使用两种方法可将表单信息传递给web服务器，分别是GET和POST
+GET方法是默认的从浏览器向web服务器传递信息的方法，它会产生一个很长的字符串，并且出现在浏览器的地址栏中。如果我们想要传递一些比较敏感的信息，不要使用GET方法，并且GET方法对字符串大小也有限制，请求字符串中最多只能有1024个字符
+POST方法是向后台传递信息比较可靠的方法。POST方法打包信息的方式与GET方法基本相同。但是POST方法不是吧信息直接放在URL的文本字符串发送，而是将这些信息作为一个单独的消息进行传递。消息以标准输出的形式传到后台程序。
+
+使用Servlet读取表单数据，这些数据会根据不同的情况使用不同的方法自动解析：
+1. getParameter():可以调用request.getParameter()方法来获取表单参数的值
+2. getParameterValues():如果参数出现一次以上，则调用该方法，并且返回多个值，比如复选框
+3. getParameterNames():如果想要得到当前请求中的所有参数的完整列表，则调用该方法
+
+一个例子：
+```
+public class LoginServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+        String title = "使用get方法读取表单内容";
+
+        String name = req.getParameter("inputEmail");
+        System.out.println(name);
+        System.out.println(req.getParameter("inputEmail"));
+        String password = req.getParameter("inputPassword");
+        String remember = req.getParameter("remember");
+
+        String docType = "<!DOCTYPE html> \n";
+        out.println(docType +
+                "<html> \n" +
+                "<head><title>" + title + "</title></head>\n" +
+                "<body bgcolor=\"#f0f0f0\">\n" +
+                "<h1 align=\"center\">" + title + "</h1>\n" +
+                "<ul>\n" +
+                "  <li><b>姓名</b>："
+                + name + "\n" +
+                "  <li><b>密码</b>："
+                + password + "\n" +
+                "  <li><b>是否选择记住我</b>: "
+                + remember + "\n" +
+                "</ul>\n" +
+                "</body></html>");
+        System.out.println(getAllParameter(req));
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+        String title = "使用post方法读取表单内容";
+
+        String name = new String(req.getParameter("inputName").getBytes("ISO8859-1"), "UTF-8");
+        String password = req.getParameter("inputPassword");
+
+        String docType = "<!DOCTYPE html> \n";
+        out.println(docType +
+                "<html> \n" +
+                "<head><title>" + title + "</title></head>\n" +
+                "<body bgcolor=\"#f0f0f0\">\n" +
+                "<h1 align=\"center\">" + title + "</h1>\n" +
+                "<ul>\n" +
+                "  <li><b>姓名</b>："
+                + name + "\n" +
+                "  <li><b>密码</b>："
+                + password + "\n" +
+                "</ul>\n" +
+                "</body></html>");
+    }
+
+    /**
+     * 获取所有的参数
+     */
+    private HashMap<String, Object> getAllParameter(HttpServletRequest request) {
+        HashMap<String, Object> result = new HashMap<>();
+        if (request == null) {
+            return result;
+        }
+        Enumeration paramNames = request.getParameterNames();
+        while (paramNames.hasMoreElements()) {
+            String paramName = (String) paramNames.nextElement();
+            String[] paramValues = request.getParameterValues(paramName);
+            if (paramValues.length == 1) {
+                // 只有一个数据，就去当前值
+                String paramValue = paramValues[0];
+                if (paramValue.length() == 0) {
+                    // 没有数据，不用执行
+                } else {
+                    // 有数据，将key/value值写入到Map中
+                    result.put(paramName, paramValue);
+                }
+            } else {
+                // 读取到了多个值
+                String paramVlue = paramValues[paramValues.length - 1];
+                result.put(paramName, paramVlue);
+            }
+        }
+        return result;
+    }
+}
+```
+
+网页代码：
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="jquery/jquery.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <title>表单</title>
+</head>
+<body>
+<div class="container">
+    <form class="form-horizontal" action="login" method="get">
+        <div class="control-group">
+            <label class="control-label" for="inputEmail">邮箱</label>
+            <div class="controls">
+                <input type="text" name="inputEmail" id="inputEmail" placeholder="请输入邮箱">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputPassword">密码</label>
+            <div class="controls">
+                <input type="password" name="inputPassword" id="inputPassword" placeholder="请输入密码">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <label class="checkbox">
+                    <input name="remember" type="checkbox"> 记住我
+                </label>
+                <button type="submit" class="btn">登录</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
+```
+
