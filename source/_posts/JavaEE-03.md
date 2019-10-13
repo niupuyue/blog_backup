@@ -527,6 +527,7 @@ public class LoginServlet extends HttpServlet {
 |User-Agent	|这个头信息识别发出请求的浏览器或其他客户端，并可以向不同类型的浏览器返回不同的内容。|
 
 读取HTTP头的方法
+
 |方法|描述|
 |---|---|
 |Cookie[] getCookies()|返回一个数组，包含客户端发送该请求的所有Cookie对象|
@@ -730,3 +731,415 @@ public class Refresh extends HttpServlet {
       }
 }
 ```
+
+## 过滤器
+Servlet可以动态的拦截请求和响应，用于变化和使用包含在其中的信息
+Servlet过滤器是可以用于Servlet编程的Java类，主要目的有以下几个
+- 客户端的请求访问资源之前，拦截这些请求
+- 服务器的响应范送给客户端之前，处理这些响应
+
+Servlet过滤器的作用：
+1. 查询请求并作出相应的行为
+2. 阻塞请求-响应对，使其不能进一步传递
+3. 修改请求头部和数据，用户可以提供自定义请求
+4. 修改响应的头部和数据，用户可以通过提供定制的响应版本来实现
+5. 与外部资源进行交互
+
+根据规范建议的各类型过滤器：
+1. 身份验证过滤器（Authentication Filters）。
+2. 数据压缩过滤器（Data compression Filters）。
+3. 加密过滤器（Encryption Filters）。
+4. 触发资源访问事件过滤器。
+5. 图像转换过滤器（Image Conversion Filters）。
+6. 日志记录和审核过滤器（Logging and Auditing Filters）。
+7. MIME-TYPE 链过滤器（MIME-TYPE Chain Filters）。
+8. 标记化过滤器（Tokenizing Filters）。
+9. XSL/T 过滤器（XSL/T Filters），转换 XML 内容
+
+过滤器通过web部署文件(web.xml)中的XML标签，然后映射到应用程序的部署描述符中的 Servlet 名称或 URL 模式
+当web容器启动web应用程序时，他会在部署描述符中声明的每一个过滤器创建一个实例。
+Filter执行的顺序鱼仔web.xml文件中声明的顺序是一致的。一般我们将Filter的声明放在Servlet之前
+
+Filter的常用方法如下：
+
+|方法|描述|
+|---|---|
+|public void doFilter(ServletRequest request,ServletResponse response)|该方法完成实际的过滤操作，当客户端请求方法和过滤器设置的URL匹配时，Servlet容器会优先调用过滤器中的doFilter方法，FilterChain用户访问后续过滤器|
+|public void init(FilterConfig config)|web应用程序启动时，web服务器将创建Filter对象实例，并调用init方法，读取web.xml中的配置信息，完成对象初始化。filter对象只会创建一次，init方法也只会执行一次，开发人员通过init方法获取参数，可获取当前代表filter配置信息的FilterConfig对象|
+|public void destory()|Servlet在销毁过滤器实例之前调用的方法，在该方法中释放资源|
+
+Servlet过滤器创建的步骤：
+1. 实现Filter接口
+2. 实现init方法，读取过滤器初始化参数
+3. 实现doFilter方法，完成对请求或过滤的响应
+4. 调用FilterChain接口对象的doFilter方法，向后续过滤器传递请求或响应
+5. 销毁过滤器
+
+例子：
+web.xml文件
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!--请求url日志记录过滤器-->
+    <filter>
+        <filter-name>logfilter</filter-name>
+        <filter-class>com.paulniu.filter.LogFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>logfilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--编码过滤器-->
+    <filter>
+        <filter-name>encodingfilter</filter-name>
+        <filter-class>com.paulniu.filter.EncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingfilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--测试Servlet-->
+    <servlet>
+        <servlet-name>DemoServlet</servlet-name>
+        <servlet-class>com.paulniu.servlet.DemoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DemoServlet</servlet-name>
+        <url-pattern>/demo</url-pattern>
+    </servlet-mapping>
+    
+</web-app>
+```
+日志过滤器
+```
+public class LogFilter implements Filter {
+
+    private FilterConfig config;
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println("paulniu:start do the logging filter");
+        this.config = config;
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        System.out.println("paulniu:before the log filter");
+        // 将请求转换成HttpServletRequest
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        // 将响应转换成HttpServletResponse
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+        // 记录日志
+        System.out.println("Log Filter 已经截取到用户请求的地址=" + request.getServletPath());
+        try {
+            // Filter 只链式处理，请求依然转发到目的地址
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("paulniu:after the log filter");
+    }
+
+    /**
+     * 销毁日志过滤器
+     */
+    @Override
+    public void destroy() {
+        this.config = null;
+        System.out.println("paulniu:end do the logging filter");
+    }
+}
+```
+编码过滤器
+```
+public class EncodingFilter implements Filter {
+    private String encoding;
+    private HashMap<String, String> params = new HashMap<>();
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // 项目开始时就已经进行读取
+        System.out.println("paulniu:before do the encoding filter");
+        encoding = filterConfig.getInitParameter("encoding");
+        for (Enumeration<?> e = filterConfig.getInitParameterNames(); e.hasMoreElements(); ) {
+            String name = (String) e.nextElement();
+            String value = filterConfig.getInitParameter(name);
+            params.put(name, value);
+        }
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        System.out.println("paulniu:before encoding " + encoding + " filter!");
+        servletRequest.setCharacterEncoding(encoding);
+        filterChain.doFilter(servletRequest, servletResponse);
+        System.out.println("after encoding " + encoding + " filter！");
+        System.err.println("----------------------------------------");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("paulniu:end do the encoding filter");
+        params = null;
+        encoding = null;
+    }
+}
+```
+Servlet测试
+```
+@WebServlet(name = "DemoServlet")
+public class DemoServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    }
+}
+```
+测试结果：
+![过滤器demo](/assets/JavaEE/javaweb_04.png)
+
+### Servlet监听器
+Servlet监听器用于监听一些重要的事情发生，监听器对象可以在事情发生前，发生后做一些必要的处理
+
+ServletContextListener：用于监听web应用的启动和销毁事件，监听器类需要实现ServletContextListener接口
+```
+public class QuartzListener implements ServletContextListener {  
+  
+    private Logger logger = LoggerFactory.getLogger(QuartzListener.class);  
+  
+    public void contextInitialized(ServletContextEvent sce) {  
+  
+    }  
+  
+    /** 
+     *在服务器停止运行的时候停止所有的定时任务 
+     */  
+    @SuppressWarnings("unchecked")  
+    public void contextDestroyed(ServletContextEvent arg0) {  
+        try {  
+            Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();  
+            List<JobExecutionContext> jobList = scheduler.getCurrentlyExecutingJobs();  
+            for (JobExecutionContext jobContext : jobList) {  
+                Job job = jobContext.getJobInstance();  
+                if (job instanceof InterruptableJob) {  
+                    ((InterruptableJob) job).interrupt();  
+                }  
+            }  
+            scheduler.shutdown();  
+        } catch (SchedulerException e) {  
+            logger.error("shut down scheduler happened error", e);  
+        }  
+    }  
+}
+```
+
+ServletContextAttributeListener:用于监听Web应用属性改变的事件，包括增加属性，删除属性，修改属性，监听器类需要实现ServletContextAttributeListener接口
+
+HttpSessionListener：用于监听Session对象的创建和销毁，监听器类需要实现HttpSessionListener接口或者HttpSessionActivationListener接口
+```
+public class SessionListener implements HttpSessionListener {  
+  
+    @Override  
+    public void sessionCreated(HttpSessionEvent arg0) {  
+  
+    }  
+  
+    @Override  
+    public void sessionDestroyed(HttpSessionEvent event) {  
+        HttpSession session = event.getSession();  
+        User user = (BrsSession) session.getAttribute("currUser");  
+        if (user != null) {  
+            //TODO something  
+        }  
+    }  
+  
+}  
+```
+
+HttpSessionActivationListener:用于监听Session对象的钝化/活化事件，监听器类需要实现javax.servlet.http.HttpSessionListener接口或者javax.servlet.http.HttpSessionActivationListener接口，或者两个都实现。
+
+HttpSessionAttributeListener：用于监听Session对象属性的改变事件，监听类需要实现
+
+部署：监听器的部署在web.xml文件中配置，在配置文件中，它的位置应该在过滤器的后面Servlet的前面
+```
+<!-- Quartz监听器 -->  
+<listener>  
+    <listener-class>  
+        com.flyer.lisenter.QuartzListener  
+    </listener-class>  
+</listener> 
+```
+
+## Servlet异常处理
+当一个Servlet抛出一个异常，Web容器通过exception-type元素的web.xml中搜索和抛出异常类型相匹配的设置
+必须在 web.xml 中使用 error-page 元素来指定对特定异常 或 HTTP 状态码 作出相应的 Servlet 调用
+
+web.xml配置
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!--请求url日志记录过滤器-->
+    <filter>
+        <filter-name>logfilter</filter-name>
+        <filter-class>com.paulniu.filter.LogFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>logfilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--编码过滤器-->
+    <filter>
+        <filter-name>encodingfilter</filter-name>
+        <filter-class>com.paulniu.filter.EncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingfilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--error-code相关页面-->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/ErrorHandler</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/ErrorHandler</location>
+    </error-page>
+
+    <!--exception-type相关页面-->
+    <error-page>
+        <exception-type>javax.servlet.ServletException</exception-type>
+        <location>/ErrorHandler</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.io.IOException</exception-type>
+        <location>/ErrorHandler</location>
+    </error-page>
+
+    <!--测试Servlet-->
+    <servlet>
+        <servlet-name>DemoServlet</servlet-name>
+        <servlet-class>com.paulniu.servlet.DemoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DemoServlet</servlet-name>
+        <url-pattern>/demo</url-pattern>
+    </servlet-mapping>
+
+    <!--错误处理Servlet-->
+    <servlet>
+        <servlet-name>ErrorHandler</servlet-name>
+        <servlet-class>com.paulniu.servlet.ErrorHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ErrorHandler</servlet-name>
+        <url-pattern>/ErrorHandler</url-pattern>
+    </servlet-mapping>
+
+</web-app>
+```
+
+异常处理页面：
+```
+public class ErrorHandler extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Throwable throwable = (Throwable)
+                request.getAttribute("javax.servlet.error.exception");
+        Integer statusCode = (Integer)
+                request.getAttribute("javax.servlet.error.status_code");
+        String servletName = (String)
+                request.getAttribute("javax.servlet.error.servlet_name");
+        if (servletName == null) {
+            servletName = "Unknown";
+        }
+        String requestUri = (String)
+                request.getAttribute("javax.servlet.error.request_uri");
+        if (requestUri == null) {
+            requestUri = "Unknown";
+        }
+        // 设置响应内容类型
+        response.setContentType("text/html;charset=UTF-8");
+
+        PrintWriter out = response.getWriter();
+        String title = "JavaWeb Error/Exception 信息";
+
+        String docType = "<!DOCTYPE html>\n";
+        out.println(docType +
+                "<html>\n" +
+                "<head><title>" + title + "</title></head>\n" +
+                "<body bgcolor=\"#f0f0f0\">\n");
+        out.println("<h1>JavaWeb异常信息实例演示</h1>");
+        if (throwable == null && statusCode == null) {
+            out.println("<h2>错误信息丢失</h2>");
+            out.println("请返回 <a href=\"" +
+                    response.encodeURL("http://localhost:8080/") +
+                    "\">主页</a>。");
+        } else if (statusCode != null) {
+            out.println("错误代码 : " + statusCode);
+        } else {
+            out.println("<h2>错误信息</h2>");
+            out.println("Servlet Name : " + servletName +
+                    "</br></br>");
+            out.println("异常类型 : " +
+                    throwable.getClass().getName() +
+                    "</br></br>");
+            out.println("请求 URI: " + requestUri +
+                    "<br><br>");
+            out.println("异常信息: " +
+                    throwable.getMessage());
+        }
+        out.println("</body>");
+        out.println("</html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+测试结果：
+在浏览器中输入错误的地址
+![Servlet异常](/assets/JavaEE/javaweb_05.png)
+
+## Servlet Cookie处理
+
+Cookie是存储在客户端上的文本文件，由服务器生成，发送给User-Agent，浏览器会将Cookie的key/value保存到某个目录下的文本文件内，下次请求同一网站时，发送该Cookie给服务器。Cookie的key和value都是由服务器自己规定的，对于JSP而言可以直接写入JSESSIONID用于标记一个回话的Session，这样服务器可以知道该用户是否为合法用户或是否需要重新登录，服务器可以设置和读取Cookie中的信息，借此维护用户在服务器中的状态
+
+Cookie的原理：
+1. 首先浏览器想服务器发送请求
+2. 服务器会根据需求生成一个Cookie对象，并且把数据保存在该对象中
+3. 然后把Cookie对象放在响应头中，并发送会给浏览器
+4. 浏览器收到服务器响应之后，提出该Cookie保存在浏览器端
+5. 当浏览器再次访问那个服务器，会把这个Cookie放在请求头并发送给服务器
+6. 服务器从请求头中提取Cookie，判别数据执行相应的操作
+
+
+# 参考文档
+[Cookie和Session](https://www.cnblogs.com/vmax-tam/p/4130589.html)
