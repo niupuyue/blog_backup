@@ -1140,6 +1140,40 @@ Cookie的原理：
 5. 当浏览器再次访问那个服务器，会把这个Cookie放在请求头并发送给服务器
 6. 服务器从请求头中提取Cookie，判别数据执行相应的操作
 
+### Cookie剖析
+Cookie通常设置在HTTP头信息中(虽然JavaScript也可以直接在浏览器设置一个Cookie)。设置Cookie的Servlet会发送如下的头信息
+![图片是我拷贝的](/assets/JavaEE/javaweb_06.png)
+
+如图所示，Set-Cookie头包含了一个名称值对，一个GMT日期，一个路径和一个域。名称和值会被URL编码。expires字段是一个指令，告诉浏览器在给定的时间和日期之后忘记Cookie
+如果浏览器被配置为存储Cookie，他将会保留此信息直到到期日期。如果用户的浏览器指向任何匹配该Cookie的路径和域的页面，他会重新发送Cookie到服务器，浏览器的头信息可能如下：
+![图片是我拷贝的](/assets/JavaEE/javaweb_07.png)
+
+Cookie方法：
+
+|方法|描述|
+|---|---|
+|public void setDomain(String pattern)|该方法设置cookie使用的域|
+|public String getDomain()|该方法获取cookie适用的域|
+|public void setMaxAge(int expiry)|设置cookie过期的时间，以秒为单位，如果不设置，则cookie会在当前Session会话中持续有效|
+|public int getMaxAge()|该方法返回cookie的最大生存周期，以秒为单位，默认情况下为-1，表示cookie会持续下去，知道浏览器关闭|
+|public String getName()|该方法返回cookie名称，名称在创建后不能改变|
+|public void setValue(String newValue)|该方法设置与cookie关联的值|
+|public String getValue()|方法获取与cookie相关联的值|
+|public void setPath(String uri)|该方法设置cookie使用的路径，如果不指定路径，与当前页面相同目录下的(包括子目录)所有URL都会返回cookie|
+|public String getPath()|该方法获取Cookie使用的路径|
+|public void setSecure(boolean flag)|该方法设置布尔值，表示cookie是否应该只在加密的(即SSL)连接上发送|
+|public void setComment(String purpose)|设置cookie的注解，该注解在浏览器向用户呈现cookie时非常有用|
+|public String getComment()|获取cookie的注释，如果cookie没有注释则返回null|
+
+### Cookie的使用
+创建一个Cookie
+```
+public class CookieServlet extends HttpServlet{
+    public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
+        Cookie cookie = new Cookie("name","value");
+    }
+}
+```
 
 # 参考文档
 [Cookie和Session](https://www.cnblogs.com/vmax-tam/p/4130589.html)
