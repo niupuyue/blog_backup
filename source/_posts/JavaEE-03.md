@@ -1203,9 +1203,13 @@ public class CookieServlet extends HttpServlet {
 ## Servlet中的Session
 
 HTTP是一种无状态的协议，这意味着每次客户端检索网页时，客户端打开一个单独的链接到服务器，服务器会自动不保留之前客户端的任何请求记录。但是仍然以下面三种方式维持客户端和服务器之间的session回话
-1. Cookie:一个web服务器可以分配一个唯一的SessionID作为每一个客户端的Cookie，对于客户端的后续请求，可以使用接收到的Cookie来识别。(但是很多浏览器可能不支持Cookie，所以这个并不是最优的解决方案)
-2. 隐藏的表单字段：一个Web服务器可以发送一个隐藏的HTML表单字段，以及唯一的一个Session回话ID，如```<input type="hide" name="sessionid" value="123456">```,这意味着当表单被提交的时候，指定的名称和值会自动包含在GET和POST请求中。每当浏览器发送请求时，session_id值可以可以用于保持不同浏览器的追踪。这个方式相对而言比较合理，但是对于一些超链接标签，我们没有发送网络请求，所以不会提交表单，所以也不是非常好的解决办法
-3. URL重定向：我们可以为每一个URL的末尾追加一些额外的数据来标识session会话。服务器会将传递过来session标识和已存储的相关session会话数据相关联，如：http://www.paulniu.com/login.jsp;sessionid=123456 URL重定向是一种更好的方式来维持Session会话，他在浏览器不支持Cookie时可以很好的完成维持Session会话的工作，缺点是会动态的生成每个URL来为页面分配一个sessionid，即使是很简单的静态页面也是如此。
+- Cookie:一个web服务器可以分配一个唯一的SessionID作为每一个客户端的Cookie，对于客户端的后续请求，可以使用接收到的Cookie来识别。(但是很多浏览器可能不支持Cookie，所以这个并不是最优的解决方案)
+- 隐藏的表单字段：一个Web服务器可以发送一个隐藏的HTML表单字段，以及唯一的一个Session回话ID，如
+```
+<input type="hide" name="sessionid" value="123456">
+```
+,这意味着当表单被提交的时候，指定的名称和值会自动包含在GET和POST请求中。每当浏览器发送请求时，session_id值可以可以用于保持不同浏览器的追踪。这个方式相对而言比较合理，但是对于一些超链接标签，我们没有发送网络请求，所以不会提交表单，所以也不是非常好的解决办法
+- URL重定向：我们可以为每一个URL的末尾追加一些额外的数据来标识session会话。服务器会将传递过来session标识和已存储的相关session会话数据相关联，如：http://www.paulniu.com/login.jsp;sessionid=123456 URL重定向是一种更好的方式来维持Session会话，他在浏览器不支持Cookie时可以很好的完成维持Session会话的工作，缺点是会动态的生成每个URL来为页面分配一个sessionid，即使是很简单的静态页面也是如此。
 
 除了上面的三种方式，Servlet还提供了HttpSession接口，该接口提供了一种跨多个页面请求或访问网站时识别用户以及存储用户相关信息的方法。
 Servlet 容器使用这个接口来创建一个 HTTP 客户端和 HTTP 服务器之间的 session 会话。会话持续一个指定的时间段，跨多个连接或页面请求。
