@@ -1168,12 +1168,153 @@ Cookie方法：
 ### Cookie的使用
 创建一个Cookie
 ```
-public class CookieServlet extends HttpServlet{
-    public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
-        Cookie cookie = new Cookie("name","value");
+public class CookieServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Cookie cookie = new Cookie("name", "value");
+        resp.addCookie(cookie);
+
+        // 得到浏览器传递的cookie数据
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                String name = c.getName();
+                String value = c.getValue();
+                System.out.println(name + "=" + value);
+            }
+        } else {
+            System.out.println("没有Cookie信息！");
+        }
     }
 }
 ```
+
+运行结果：
+![Cookie使用](/assets/JavaEE/javaweb_08.png)
+
+这里我们可以模拟一个登陆的例子，因为里面需要使用到Session的内容，所以我们等Session的内容完成之后一块写一个例子
+
+## Servlet中的Session
+
+HTTP是一种无状态的协议，这意味着每次客户端检索网页时，客户端打开一个单独的链接到服务器，服务器会自动不保留之前客户端的任何请求记录。但是仍然以下面三种方式维持客户端和服务器之间的session回话
+1. Cookie:一个web服务器可以分配一个唯一的SessionID作为每一个客户端的Cookie，对于客户端的后续请求，可以使用接收到的Cookie来识别。(但是很多浏览器可能不支持Cookie，所以这个并不是最优的解决方案)
+2. 隐藏的表单字段：一个Web服务器可以发送一个隐藏的HTML表单字段，以及唯一的一个Session回话ID，如```<input type="hide" name="sessionid" value="123456">```,这意味着当表单被提交的时候，指定的名称和值会自动包含在GET和POST请求中。每当浏览器发送请求时，session_id值可以可以用于保持不同浏览器的追踪。这个方式相对而言比较合理，但是对于一些超链接标签，我们没有发送网络请求，所以不会提交表单，所以也不是非常好的解决办法
+3. URL重定向：我们可以为每一个URL的末尾追加一些额外的数据来标识session会话。服务器会将传递过来session标识和已存储的相关session会话数据相关联，如：http://www.paulniu.com/login.jsp;sessionid=123456 URL重定向是一种更好的方式来维持Session会话，他在浏览器不支持Cookie时可以很好的完成维持Session会话的工作，缺点是会动态的生成每个URL来为页面分配一个sessionid，即使是很简单的静态页面也是如此。
+
+除了上面的三种方式，Servlet还提供了HttpSession接口，该接口提供了一种跨多个页面请求或访问网站时识别用户以及存储用户相关信息的方法。
+Servlet 容器使用这个接口来创建一个 HTTP 客户端和 HTTP 服务器之间的 session 会话。会话持续一个指定的时间段，跨多个连接或页面请求。
+我们会通过调用 HttpServletRequest 的公共方法 getSession() 来获取 HttpSession 对象
+```
+HttpSession session = request.getSession();
+```
+
+Session常用方法：
+
+|方法|描述|
+|---|---|
+|public Object getAttribute(String name)|该方法返回在该Session会话中具有指定名称的对象，如果没有指定名称的对象，返回null|
+|public Enumeration getAttributeNames()|该方法返回String类型对象的枚举，String对象包含所有绑定到该Session会话的对象的名称|
+|public long getCreationTime()|该方法返回Session会话被创建的时间,以毫秒为单位|
+|public String getId()|该方法返回一个包含Session会话唯一标识符的字符串|
+|public long getLastAccessedTime()|该方法返回客户端最后一次发送与Session会话相关的请求的时间，以毫秒为单位|
+|public int getMaxInactiveInterval()|该方法返回Servlet容器在客户端访问时保持session会话打开的最大时间间隔，以秒为单位|
+|public void invalindate()|指示该Session会话无效，并解除绑定到它上面的任何对象|
+|public boolean isNew()|如果客户端还不知道该Session会话，或者客户端选择不参与该Session会话，返回true|
+|public void removeAttribute(String name)|从Session会话中移除指定名称对象|
+|public void setAttribute(String name,Object value)|该方法使用指定的名称绑定一个对象到该Session会话|
+|public void setMaxInactiveInterval(int interval)|该方法在Servlet中指示该Session会话无效之前，指定客户端请求之前的时间，以秒为单位|
+
+Session追踪实例：
+```
+public class SessionTrackServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+        // 如果不存在Session会话，则创建一个Session会话
+        HttpSession session = req.getSession(true);
+        // 获取Session创建的时间
+        Date createTime = new Date(session.getCreationTime());
+        // 获取该网页最后一次访问的时间
+        Date lastAccessTime = new Date(session.getLastAccessedTime());
+
+        // 设置日期输出格式
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String title = "Servlet session 实例";
+        Integer visitCount = new Integer(0);
+        String visitCountKey = new String("visitCount");
+        String userIDKey = new String("userID");
+        String userID = new String("paulniu");
+        if (session.getAttribute(visitCountKey) == null) {
+            session.setAttribute(visitCountKey, new Integer(0));
+        }
+
+        // 检查网页上是否有新的访问者
+        if (session.isNew()) {
+            title = "Servlet Session 实例";
+            session.setAttribute(userIDKey, userID);
+        } else {
+            visitCount = (Integer) session.getAttribute(visitCountKey);
+            visitCount = visitCount + 1;
+            userID = (String) session.getAttribute(userIDKey);
+        }
+        session.setAttribute(visitCountKey, visitCount);
+
+        // 设置响应内容类型
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        String docType = "<!DOCTYPE html>\n";
+        out.println(docType +
+                "<html>\n" +
+                "<head><title>" + title + "</title></head>\n" +
+                "<body bgcolor=\"#f0f0f0\">\n" +
+                "<h1 align=\"center\">" + title + "</h1>\n" +
+                "<h2 align=\"center\">Session 信息</h2>\n" +
+                "<table border=\"1\" align=\"center\">\n" +
+                "<tr bgcolor=\"#949494\">\n" +
+                "  <th>Session 信息</th><th>值</th></tr>\n" +
+                "<tr>\n" +
+                "  <td>id</td>\n" +
+                "  <td>" + session.getId() + "</td></tr>\n" +
+                "<tr>\n" +
+                "  <td>创建时间</td>\n" +
+                "  <td>" + df.format(createTime) +
+                "  </td></tr>\n" +
+                "<tr>\n" +
+                "  <td>最后访问时间</td>\n" +
+                "  <td>" + df.format(lastAccessTime) +
+                "  </td></tr>\n" +
+                "<tr>\n" +
+                "  <td>用户 ID</td>\n" +
+                "  <td>" + userID +
+                "  </td></tr>\n" +
+                "<tr>\n" +
+                "  <td>访问统计：</td>\n" +
+                "  <td>" + visitCount + "</td></tr>\n" +
+                "</table>\n" +
+                "</body></html>");
+    }
+}
+```
+处理结果：
+![session追踪](/assets/JavaEE/javaweb_09.png)
+
+## 登录demo
+
 
 # 参考文档
 [Cookie和Session](https://www.cnblogs.com/vmax-tam/p/4130589.html)
