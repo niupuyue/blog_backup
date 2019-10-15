@@ -1318,6 +1318,167 @@ public class SessionTrackServlet extends HttpServlet {
 ![session追踪](/assets/JavaEE/javaweb_09.png)
 
 ## 登录demo
+使用Cookie登录
+```
+public class LoginCookieServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    public LoginCookieServlet(){
+
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request,response);
+        // 获取表达中的username和password
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        // 定义一个名为username
+        Cookie cookie = new Cookie(username,password);
+        cookie.setPath("");
+        cookie.setComment("这是一个cookie");
+        response.addCookie(cookie);
+        request.getRequestDispatcher("loginSuccess.jsp").forward(request,response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.getWriter().append("serverd ad:").append(request.getServletPath());
+    }
+}
+```
+jsp页面
+```
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>登录demo</title>
+</head>
+<body>
+<form action="login" method="post">
+    <input type="text" name="username" />
+    <input type="password" name="password">
+    <input type="submit" value="登录">
+</form>
+</body>
+</html>
+```
+
+![登陆成功之后将cookie对象发送到浏览器中](/assets/JavaEE/javaweb_10.png)
+
+使用Session登录
+```
+public class LoginSessionServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.getWriter().append("served at: ").append(req.getServletPath());
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+        User user = new User(username,password);
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateTime = dateFormat.format(new Date());
+        HttpSession session = req.getSession();
+        session.setAttribute("user",user);
+        session.setAttribute("loginTime",dateTime);
+        session.setAttribute("sessionId",session.getId());
+        // 请求转发
+        req.getRequestDispatcher("loginSuccess.jsp").forward(req,resp);
+    }
+}
+```
+jsp页面：
+```
+// login.jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>登录demo</title>
+</head>
+<body>
+<form action="loginsession" method="post">
+    <input type="text" name="username"/>
+    <input type="password" name="password">
+    <input type="submit" value="登录">
+</form>
+</body>
+</html>
+
+// loginSuccess.jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@page import="java.text.DateFormat" %>
+<jsp:directive.page import="com.paulniu.bean.User"/>
+<% User user = (User) session.getAttribute("user");
+    String dateTime = (String) session.getAttribute("loginTime");
+    String sessionId = (String) session.getAttribute("sessionId");
+%>
+<html>
+<head>
+    <title>登录结果页面</title>
+</head>
+<body>
+Hello,this is an index page.<p>
+    用户名：<%=user.getUserName()%><p>
+    密码：<%=user.getPassword()%><p>
+    登陆时间：<%=dateTime %><p>
+    SessionId：<%=sessionId %><p>
+</body>
+</html>
+```
+User对象
+```
+public class User {
+
+    private String userName;
+    private String password;
+
+    public User(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
+    }
+
+    public User() {
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+}
+```
+
+在没有提交表单之前
+![原始SessionID](/assets/JavaEE/javaweb_11.png)
+
+表单提交之后
+![从服务器端返回的SessionID](/assets/JavaEE/javaweb_12.png)
+
 
 
 # 参考文档
