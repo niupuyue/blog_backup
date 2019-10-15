@@ -1479,6 +1479,374 @@ public class User {
 表单提交之后
 ![从服务器端返回的SessionID](/assets/JavaEE/javaweb_12.png)
 
+## Servlet 数据库
+准备测试数据
+```
+CREATE TABLE `websites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL DEFAULT '' COMMENT '站点名称',
+  `url` varchar(255) NOT NULL DEFAULT '',
+  `alexa` int(11) NOT NULL DEFAULT '0' COMMENT 'Alexa 排名',
+  `country` char(10) NOT NULL DEFAULT '' COMMENT '国家',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+INSERT INTO `websites` VALUES ('1', 'Google', 'https://www.google.cm/', '1', 'USA'), ('2', '淘宝', 'https://www.taobao.com/', '13', 'CN'), ('3', '菜鸟教程', 'http://www.runoob.com', '5892', ''), ('4', '微博', 'http://weibo.com/', '20', 'CN'), ('5', 'Facebook', 'https://www.facebook.com/', '3', 'USA');
+```
+
+访问数据库
+```
+public class DataBaseServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1l;
+
+    //JDBC驱动名以及数据库URL
+    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/javawebdb";
+
+    // 数据库的用户名和密码
+    static final String USER = "root";
+    static final String PASS = "root";
+
+    public DataBaseServlet() {
+
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Connection conn = null;
+        Statement stmt = null;
+        // 设置响应内容类型
+        resp.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+        String title = "Servlet Mysql 测试";
+        String docType = "<!DOCTYPE html>\n";
+        out.println(docType +
+                "<html>\n" +
+                "<head><title>" + title + "</title></head>\n" +
+                "<body bgcolor=\"#f0f0f0\">\n" +
+                "<h1 align=\"center\">" + title + "</h1>\n");
+        try {
+            // 注册 JDBC 驱动器
+            Class.forName("com.mysql.jdbc.Driver");
+
+            // 打开一个连接
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+
+            // 执行 SQL 查询
+            stmt = conn.createStatement();
+            String sql;
+            sql = "SELECT id, name, url FROM websites";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            // 展开结果集数据库
+            while (rs.next()) {
+                // 通过字段检索
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String url = rs.getString("url");
+
+                // 输出数据
+                out.println("ID: " + id);
+                out.println(", 站点名称: " + name);
+                out.println(", 站点 URL: " + url);
+                out.println("<br />");
+            }
+            out.println("</body></html>");
+
+            // 完成后关闭
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException se) {
+            // 处理 JDBC 错误
+            se.printStackTrace();
+        } catch (Exception e) {
+            // 处理 Class.forName 错误
+            e.printStackTrace();
+        } finally {
+            // 最后是用于关闭资源的块
+            try {
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException se2) {
+            }
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+运行结果
+![运行结果](/assets/JavaEE/javaweb_13.png)
+
+如果向数据库中插入数据
+```
+//编写预处理 SQL 语句
+String sql= "INSERT INTO websites1 VALUES(?,?,?,?,?)";
+
+//实例化 PreparedStatement
+ps = conn.prepareStatement(sql);
+
+//传入参数，这里的参数来自于一个带有表单的jsp文件，很容易实现
+ps.setString(1, request.getParameter("id"));
+ps.setString(2, request.getParameter("name"));
+ps.setString(3, request.getParameter("url"));
+ps.setString(4, request.getParameter("alexa"));
+ps.setString(5, request.getParameter("country"));
+
+//执行数据库更新操作，不需要SQL语句
+ps.executeUpdate();
+sql = "SELECT id, name, url FROM websites1";
+ps = conn.prepareStatement(sql);
+
+//获取查询结果
+ResultSet rs = ps.executeQuery();
+```
+
+## Servlet文件的上传和下载
+文件上传：
+```
+public class UploadServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1l;
+
+    // 上传文件存储的路径
+    private static final String UPLOAD_DIRECTORY = "upload";
+    // 上传配置
+    private static final int MEMORY_THRESHOLD = 1024 * 1024 * 3;
+    private static final int MAX_FILE_SIZE = 1024 * 1024 * 40;
+    private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 上传数据及保存文件
+        // 检测是否为多媒体上传
+        if (!ServletFileUpload.isMultipartContent(request)){
+            // 如果不是则停止
+            PrintWriter writer = response.getWriter();
+            writer.println("Error: 表单必须包含 enctype=multipart/form-data");
+            writer.flush();
+            return;
+        }
+        // 配置参数
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        // 设置内存临界值 - 超过该值之后将产生临时文件并存储于临时目录中
+        factory.setSizeThreshold(MEMORY_THRESHOLD);
+        // 设置临时存储目录
+        factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+
+        ServletFileUpload upload = new ServletFileUpload(factory);
+
+        // 设置最大文件上传值
+        upload.setFileSizeMax(MAX_FILE_SIZE);
+        // 设置最大请求值(包含文件和表单数据)
+        upload.setSizeMax(MAX_REQUEST_SIZE);
+        // 中文处理
+        upload.setHeaderEncoding("UTF-8");
+
+        // 构造临时路径存储上传的文件
+        // 这个路径相对于当前应用的目录
+        String uploadPath = request.getServletContext().getRealPath("./") + File.separator+ UPLOAD_DIRECTORY;
+
+        // 如果目录不存在则创建
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()){
+            uploadDir.mkdirs();
+        }
+
+        try {
+            // 解析请求的内容提取文件数据
+            List<FileItem> formItems = upload.parseRequest(request);
+            if (formItems != null && formItems.size() > 0){
+                // 迭代表单数据
+                for (FileItem item:formItems){
+                    // 处理不在表单中的字段
+                    if (!item.isFormField()){
+                        String fileName = new File(item.getName()).getName();
+                        String filePath = uploadPath + File.separator + fileName;
+                        File storeFile = new File(filePath);
+                        // 在控制台输出文件的上传路径
+                        System.out.println(filePath);
+                        // 保存文件到硬盘
+                        item.write(storeFile);
+                        request.setAttribute("message","上传文件成功");
+                    }
+                }
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            request.setAttribute("message","错误信息"+ex.getMessage());
+        }
+        // 跳转到message.jsp文件中
+        request.getServletContext().getRequestDispatcher("/message.jsp").forward(request,response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    }
+}
+```
+文件上传upload.jsp
+```
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>文件上传</title>
+</head>
+<body>
+<h1>文件上传实例</h1>
+<form method="post" action="upload" enctype="multipart/form-data">
+    选择一个文件：
+    <input type="file" name="uploadFile">
+    <br/><br/>
+    <input type="submit" value="上传">
+</form>
+</body>
+</html>
+```
+文件上传结果页message.jsp
+```
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>文件上传结果</title>
+</head>
+<body>
+<center>
+    <h2>${message}</h2>
+</center>
+</body>
+</html>
+```
+
+上传文件结果
+![上传成功](/assets/JavaEE/javaweb_14.png)
+保存文件路径
+![保存路径](/assets/JavaEE/javaweb_15.png)
+
+文件下载
+首先需要声明一个页面，当访问这个页面的时候，将所有可以下载的内容展示在网页上
+```
+public class ListFilesServlet extends HttpServlet {
+
+    // 上传文件存储的路径
+    private static final String UPLOAD_DIRECTORY = "upload";
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 获取上传文件的目录
+        String uploadPath = request.getServletContext().getRealPath("./") + File.separator+ UPLOAD_DIRECTORY;
+        // 存储要下载的文件名称
+        Map<String,String> fileNameMap = new HashMap<>();
+        // 递归遍历filePath目录下的所有文件和目录
+        listfile(new File(uploadPath),fileNameMap);
+        // 将Map集合发送listFile.jsp文件中
+        request.setAttribute("fileNameMap",fileNameMap);
+        request.getRequestDispatcher("/listfile.jsp").forward(request,response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req,resp);
+    }
+
+    /**
+     * 遍历给定文件夹下的所有文件
+     * @param file
+     * @param map
+     */
+    private void listfile(File file,Map<String,String> map){
+        // 如果file代表的不是一个文件而是一个目录，则需要递归调用
+        if (!file.isFile()){
+            // 列出该目录下所有的文件和目录
+            File[] files = file.listFiles();
+            for (File f:files){
+                listfile(f,map);
+            }
+        }else {
+            // 获取到的文件名和对象直接放在Map集合中
+            map.put(file.getName(),file.getName());
+        }
+    }
+}
+```
+
+listfile.jsp
+```
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<html>
+<head>
+    <title>已经上传的文件列表</title>
+</head>
+<body>
+<c:forEach var="me" items="${fileNameMap}">
+    <c:url value="download" var="downurl">
+        <c:param name="filename" value="${me.key}"></c:param>
+    </c:url>
+    ${me.value}<a href="${downurl}">下载</a>
+    <br/>
+</c:forEach>
+</body>
+</html>
+```
+
+下载的Servlet
+```
+public class DownloadServlet extends HttpServlet {
+    // 上传文件存储的路径
+    private static final String UPLOAD_DIRECTORY = "upload";
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request,response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String fileName = request.getParameter("filename");
+        fileName = new String(fileName.getBytes("iso8859-1"),"UTF-8");
+        // 上传的文件保存在固定的目录里
+        String uploadPath = request.getServletContext().getRealPath("./") + File.separator+ UPLOAD_DIRECTORY;
+        // 得到需要下载的文件
+        File file = new File(uploadPath +File.separator+fileName);
+        // 如果文件不存在
+        if (!file.exists()){
+            request.setAttribute("message","你想要下载的资源已被删除");
+            request.getRequestDispatcher("/message.jsp").forward(request,response);
+            return;
+        }
+        // 设置响应头
+        response.setHeader("content-disposition","attachment;filename="+ URLEncoder.encode(fileName,"UTF-8"));
+        // 读取要下载的文件，保存到文件输入流中
+        FileInputStream fis = new FileInputStream(uploadPath + File.separator+fileName);
+        // 创建输出流
+        OutputStream os = response.getOutputStream();
+        // 设置缓冲区
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while ((len = fis.read(buffer)) > 0){
+            // 输出缓冲区的内容到浏览器，实现文件下载
+            os.write(buffer,0,len);
+        }
+        // 关闭文件输入流
+        fis.close();
+        // 关闭输出流
+        os.close();
+    }
+}
+```
+
+![文件列表](/assets/JavaEE/javaweb_16.png)
+
 
 
 # 参考文档
