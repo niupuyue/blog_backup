@@ -1847,7 +1847,78 @@ public class DownloadServlet extends HttpServlet {
 
 ![文件列表](/assets/JavaEE/javaweb_16.png)
 
+## Servlet处理日期
 
+Servlet可以使用Java中大多数的方法，这也是Servlet的优势之一。
+日期相关的常用方法：
+
+|方法|描述|
+|---|---|
+|boolean after(Date date)|如果调用的Date对象中包含的日期在date指定日期之后返回true|
+|boolean before(Date date)|如果调用的Date对象中包含的日期在date指定日期之前返回true|
+|Object clone()|重复调用Data对象|
+|int compareTo(Date date)|把调用对象的值与date值进行比较，如果调用对象在date之前返回负数，如果调用对象在datte之后返回正数，两者相同返回0|
+|int compareTo(Object obj)|如果obj是Date类型，使用的方式同上|
+|boolean equals(Object date)|如果调用的Date对象中包含的时间和日期与date指定的相同，返回true|
+|long getTime()|返回毫秒数|
+|int hashCode()|未调用返回哈希代码|
+|void setTime(long time)|设置time指定的时间和日期，毫秒为单位|
+
+例子：
+```
+public class DateServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+        String title = "显示当前的日期和时间";
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String docType = "<!DOCTYPE html>\n";
+        out.println(docType +
+                "<html>\n" +
+                "<head><title>" + title + "</title></head>\n" +
+                "<body bgcolor=\"#f0f0f0\">\n" +
+                "<h1 align=\"center\">" + title + "</h1>\n" +
+                "<h2 align=\"center\">" + sdf.format(date) + "</h2>\n" +
+                "</body></html>");
+    }
+}
+```
+
+![时间servlet运行结果](/assets/JavaEE/javaweb_17.png)
+
+## Servlet页面重定向
+当文档移动到新的位置，我们需要向客户端发送这个新位置，我们需要用到网页重定向。当然也有可能是负载均衡，或者为了简单的随机，这些情况都有可能使用到网页重定向。
+
+例子：
+```
+public class PageRedirectServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req,resp);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 设置响应内容
+        resp.setContentType("text/html;charset=UTF-8");
+        // 设置重定向的位置
+        String site = new String("http://www.paulniu.com");
+        resp.setStatus(resp.SC_MOVED_TEMPORARILY);
+        resp.setHeader("Location",site);
+    }
+}
+```
+
+## 
 
 # 参考文档
 [Cookie和Session](https://www.cnblogs.com/vmax-tam/p/4130589.html)
