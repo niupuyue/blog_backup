@@ -1,5 +1,5 @@
 ---
-title: JavaEE 03 JavaWeb基础
+title: JavaEE 03 JavaWeb基础(Servlet)
 date: 2019-10-01 21:37:03
 tags:
   - JavaEE
@@ -1918,7 +1918,9 @@ public class PageRedirectServlet extends HttpServlet {
 }
 ```
 
-## 
+# JSP
+
+本来想写在一个页面里面的，但是东西有点太多，所以分开多个博客书写
 
 # 参考文档
 [Cookie和Session](https://www.cnblogs.com/vmax-tam/p/4130589.html)
