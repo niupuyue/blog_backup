@@ -124,7 +124,7 @@ vim ~/.ssh/config
 ```
 
 编辑的内容如下所示
-```
+```vim 
 Host paulniu
 HostName 47.93.236.188
 Port 22
