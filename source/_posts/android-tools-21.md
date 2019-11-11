@@ -36,3 +36,16 @@ Code Review
 3. 讨论不同实现思路的方式以及优劣势
 
 # Android代码Lint检查
+除了组员之间的代码review，我们还可以通过Lint检查。
+通过Android studio编译工具执行Lint检查
+
+1. 执行 android studio -->  Analyze  --> Inspect code操作
+![打开代码检查框](/assets/tools/tools-review-01.png)
+
+2. 在代码检查框中选择为整个工程执行lint检查？还是整个module或者是当前的源文件执行lint检查，这里为了简单起见，我们只为当前的源代码文件执行lint检查，然后执行确认即可
+![](/assets/tools/tools-review-02.png)
+
+3. 接下来就可以在我们的Android studio查看lint检查结果了
+![](/assets/tools/tools-review-03.png)
+
+可以发现我们lint检查之后出现了许多检查结果，其中在uuelectricrenter项目下存在着多条检查信息，下面我们就分析一下检测结果。
