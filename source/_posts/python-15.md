@@ -15,5 +15,54 @@ tags:
 
 代码：
 ```
+# conding=utf8
+import os
+
+def formatValue(line):
+    result = ""
+    start = int(line.find("type") + 5)
+    end = int(line.find("jobID") - 1)
+    type = line[start:end]
+    start = int(line.find("jobID") + 6)
+    end = int(line.find("jobName") - 1)
+    jobID = line[start:end]
+    start = int(line.find("jobName") + 8)
+    end = int(line.find("tags") - 1)
+    jobName = line[start:end]
+    start = int(line.find("tags") + 5)
+    end = int(line.find("content") - 1)
+    tags = line[start:end]
+    start = int(line.find("content") + 8)
+    end = int(line.find("createTime") - 1)
+    content = line[start:end]
+    start = int(line.find("createTime") + 11)
+    end = int(len(line) - 2)
+    createTime = line[start:end]
+    result = type + '\t' + jobID + '\t' + jobName + '\t' + tags + '\t' + content + '\t' + createTime
+    return result
+
+# 修改需要遍历的文件夹目录
+g = os.walk("D:\\files\\001")
+# 创建一个新目录用来存放输出结果
+outRoot = os.path.exists("D:\\outputfiles")
+if not outRoot:
+    # 如果新目录不存在，则创建新目录
+    os.mkdir("D:\\outputfiles")
+for path, dir_list, file_list in g:
+    for file_name in file_list:
+        # 判断文件夹在目标目录中是否存在
+        file = open(os.path.join(path, file_name), encoding='utf-8', errors='ignore')
+        line = file.readline()
+        while line:
+            # 此处line就是每一行所代表的的内容
+            # result最后返回的数据，需要写入到新的文件中
+            result = formatValue(line)
+            # 需要数据写入到新的文件中
+            # 生成新的文件名称
+            outNewFileName = "survery-" + file_name + ".txt"
+            newFile = open("D:\\outputfiles" + "\\" + outNewFileName, "a",encoding='utf-8')
+            newFile.writelines(result)
+            newFile.write("\n")
+            line = file.readline()
 
 ```
