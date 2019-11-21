@@ -109,7 +109,170 @@ public void setSpan(Object what,int start,int end,int flags)
     - Spannable.SPAN_EXCLUSIVE_EXCLUSIVE:在Span前后输入的字符都不应用Span效果
 
 文字叙述比较难理解，我们来看一下图，这里只针对输入框
-       
+![原始样式](/assets/tools/tools-spanstring-01.png)
+
+## ForegroundColorSpan
+使用的方式如下
+```
+public class ForgegroundColorActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_foreground_color);
+
+        TextView tvColor = findViewById(R.id.tvColor);
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        sb.append("测试字体颜色");
+        ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.RED);
+        sb.setSpan(redSpan,0,2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.GREEN);
+        sb.setSpan(greenSpan,2,4,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ForegroundColorSpan blueSpan = new ForegroundColorSpan(Color.BLUE);
+        sb.setSpan(blueSpan,4,6,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        tvColor.setText(sb);
+    }
+}
+```
+
+效果如下所示：
+![颜色字体](/assets/tools/tools-spanstring-03.png)
+
+## ImageSpan
+
+文字添加一个图片。我们都知道可以在TextView中通过drawableLeft等操作添加一个图片，但是这样的图片有时候不符合我们的要求，比如我们希望将图片放在文字的末尾(注意是文字的末尾)
+看一下例子
+
+```
+public class ImageSpanActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_imagespan);
+        TextView tvImage = findViewById(R.id.tvImage);
+
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        String ss = "这是测试文字a";
+        sb.append(ss);
+        ImageSpan span = new ImageSpan(this, R.drawable.aliwx_s001);
+        sb.setSpan(span, ss.length() - 1, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvImage.setText(sb);
+    }
+}
+```
+
+看一下效果图
+![图片字体](/assets/tools/tools-spanstring-04.png)
+
+OK,能够显示图片到textview中了，但是目测好像图片的大小比较大，怎么才能够让图片的大小和文字的大小想接近内，好吧，先看一下代码
+这里我们需要写一个类，继承自ImageSpan类，并且在类中重写getSize方法重新绘制图片大小，重写onDraw方法，重新绘制图片
+```
+public class ResizeImageSpan extends ImageSpan {
+
+    public ResizeImageSpan(Context context, int res) {
+        super(context, res);
+    }
+
+    @Override
+    public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) {
+        try {
+            // 获取默认的drawable对象
+            Drawable drawable = getDrawable();
+            // 默认drawable所占有的矩形空间
+            Rect rect = drawable.getBounds();
+            // 判断当前尺寸大小
+            if (fm != null) {
+                Paint.FontMetricsInt fmPaint = paint.getFontMetricsInt();
+                int fontHeight = fmPaint.bottom - fmPaint.top;
+                int drHeight = rect.bottom - rect.top;
+                int top = drHeight / 2 - fontHeight / 4;
+                int bottom = drHeight / 2 + fontHeight / 4;
+                // 设置尺寸
+                fm.ascent = -bottom;
+                fm.top = -bottom;
+                fm.bottom = top;
+                fm.descent = top;
+            }
+            return rect.right;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top, int y, int bottom, Paint paint) {
+        try {
+            Drawable b = getDrawable();
+            Paint.FontMetricsInt fm = paint.getFontMetricsInt();
+            int transY = (y + fm.descent + y + fm.ascent) / 2 - b.getBounds().bottom / 2;
+            canvas.save();
+            canvas.translate(x, transY);
+            b.draw(canvas);
+            canvas.restore();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+```
+
+并且当我们调用的时候，不再使用上面的简单调用，而是使用如下的方式
+```
+SpannableStringBuilder sb = new SpannableStringBuilder();
+        String ss = "这是测试文字a";
+        sb.append(ss);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.aliwx_s001);
+        Drawable drawable = new BitmapDrawable(bitmap);
+        if (drawable != null){
+            drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+        }
+        ResizeImageSpan span = new ResizeImageSpan(drawable);
+        sb.setSpan(span, ss.length() - 1, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvImage.setText(sb);
+```
+
+优化图片大小
+![图片字体](/assets/tools/tools-spanstring-05.png)
+
+## ClickableSpan
+可以点击的文字
+```
+public class ClickableSpanActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_clickable);
+
+        TextView textView = findViewById(R.id.tvClick);
+
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        String ss = "这是测试文字";
+        sb.append(ss);
+        ClickableSpan span = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                Toast.makeText(ClickableSpanActivity.this, "点击了文字", Toast.LENGTH_LONG).show();
+            }
+        };
+        sb.setSpan(span, sb.length() - 2, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.RED);
+        sb.setSpan(colorSpan, sb.length() - 2, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        textView.setText(sb);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+}
+```
+
+效果如下所示
+![点击文字](/assets/tools/tools-spanstring-06.gif)
 
 # 参考资料
 [强大的SpannableStringBuilder](https://www.jianshu.com/p/f004300c6920)
