@@ -387,3 +387,25 @@ public class Test {
 
 ### 查询使用聚合函数
 
+```
+ <select id="findTotal" resultType="Integer">
+        select count(*) from user;
+    </select>
+```
+
+```
+ /**
+     * 查询数据总数
+     */
+    public static void findTotal(){
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession();
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        int count = userDao.findTotal();
+        System.out.println(count);
+        session.close();
+    }
+```
+
+![聚合函数查询结果](/assets/JavaEE/mybatis-06.png)
