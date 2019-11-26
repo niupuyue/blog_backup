@@ -203,3 +203,187 @@ public class MyBatisTest {
 运行之后的结果如图
 
 ![运行结果](/assets/JavaEE/mybatis-02.png)
+
+### Mybatis的增删改查
+IUserDao接口
+```
+package com.paulniu.mybatis_01;
+
+import com.paulniu.domain.User;
+
+import java.util.List;
+
+public interface IUserDao {
+
+    List<User> findAll();
+
+    User findById(Integer id);
+
+    int saveUser(User user);
+
+    int updateUser(User user);
+
+    int deleteUser(Integer id);
+
+}
+```
+
+IUserDao.xml
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paulniu.mybatis_01.IUserDao">
+    <select id="findAll" resultType="com.paulniu.domain.User">
+        select * from user
+    </select>
+    <select id="findById" resultType="com.paulniu.domain.User" parameterType="int">
+        select * from user where id = #{uid}
+    </select>
+
+    <insert id="saveUser" parameterType="com.paulniu.domain.User">
+        insert into user (username,birthday,sex,address) values (#{username},#{birthday},#{sex},#{address})
+    </insert>
+
+    <update id="updateUser" parameterType="com.paulniu.domain.User">
+        update user set username = #{username} ,birthday=#{birthday},sex=#{sex},address=#{address} where id = #{id}
+    </update>
+
+    <delete id="deleteUser" parameterType="Integer">
+        delete from user where id = #{id}
+    </delete>
+</mapper>
+```
+
+测试文件
+```
+public class Test {
+    private static InputStream is;
+
+    public static void main(String[] args) throws IOException {
+        is = Resources.getResourceAsStream("SQLMapConfig.xml");
+        deleteUser();
+        is.close();
+    }
+
+    /**
+     * 查询所有用户
+     */
+    public static void findAll() {
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession();
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        List<User> users = userDao.findAll();
+        for (User user : users) {
+            System.out.println("user = " + user.toString());
+        }
+        session.close();
+
+    }
+
+    /**
+     * 根据id查询用户
+     */
+    public static void findById(){
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession();
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        User user = userDao.findById(41);
+        System.out.println(user);
+        session.close();
+    }
+
+    /**
+     * 保存新用户
+     */
+    public static void saveUser(){
+        User user = new User();
+        user.setUsername("哈哈");
+        user.setSex("男");
+        user.setBirthday(new Date());
+        user.setAddress("北京丰台");
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession();
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        int count = userDao.saveUser(user);
+        System.out.println(count);
+        session.commit();
+        session.close();
+    }
+
+    /**
+     * 更新用户信息
+     */
+    public static void updateUser(){
+        User user = new User();
+        user.setUsername("哈哈");
+        user.setSex("男");
+        user.setBirthday(new Date());
+        user.setAddress("北京丰台");
+        user.setId(42);
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession();
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        int count = userDao.updateUser(user);
+        System.out.println(count);
+        session.commit();
+        session.close();
+    }
+
+    /**
+     * 删除用户
+     */
+    public static void deleteUser(){
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession();
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        int count = userDao.deleteUser(52);
+        System.out.println(count);
+        session.commit();
+        session.close();
+    }
+
+}
+```
+
+如果在写入数据时出现乱码问题，则需要设置编码格式
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- mybatis主配置文件 -->
+<configuration>
+    <!-- 配置环境 -->
+    <environments default="mysql">
+        <environment id="mysql">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <!-- 配置连接基本信息 -->
+                <property name="driver" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis_db?characterEncoding=utf8" />
+                <property name="username" value="root" />
+                <property name="password" value="root" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 指定映射配置文件位置，映射配置文件指的是每个独立到的配置文件 -->
+    <mappers>
+        <mapper resource="com/paulniu/mybatis_01/IUserDao.xml" />
+    </mappers>
+</configuration>
+```
+
+![增加数据运行结果](/assets/JavaEE/mybatis-03.png)
+![删除数据运行结果](/assets/JavaEE/mybatis-04.png)
+![修改数据运行结果](/assets/JavaEE/mybatis-05.png)
+
+### 查询使用聚合函数
+
