@@ -409,3 +409,11 @@ public class Test {
 ```
 
 ![聚合函数查询结果](/assets/JavaEE/mybatis-06.png)
+
+### Mybatis输出结果的封装
+
+resultType配置类型结果
+resultType属性可以指定结果集类型，它支持基本类型和试题类型
+
+resultMap结果集
+resultMap标签可以创建查询的列名和实体类的属性名称不一致时创建映射关系。在select标签中使用resultMap属性指定引用即可。同时resultMap属性可以实现将查询结果映射为复杂类的pojo。比如在查询结果映射对象中包括pojo和list实现实现一对一或一对多查询。
