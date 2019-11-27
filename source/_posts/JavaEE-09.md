@@ -410,10 +410,75 @@ public class Test {
 
 ![聚合函数查询结果](/assets/JavaEE/mybatis-06.png)
 
-### Mybatis输出结果的封装
+### Mybatis封装
 
+#### 结果的封装
 resultType配置类型结果
 resultType属性可以指定结果集类型，它支持基本类型和试题类型
 
 resultMap结果集
 resultMap标签可以创建查询的列名和实体类的属性名称不一致时创建映射关系。在select标签中使用resultMap属性指定引用即可。同时resultMap属性可以实现将查询结果映射为复杂类的pojo。比如在查询结果映射对象中包括pojo和list实现实现一对一或一对多查询。
+
+#### 参数
+parameterType配置参数，我们在使用SQL语句传参时，使用标签parameterType属性来设定。该属性的取值可以是基本类型，引用类型，还可以是实体类类型(POJO类)。同时也可以使用实体类的包装类
+
+> 注意：基本类型和String类型我们可以直接写类型名称，也可以使用包名.类名的方式。实体类类型只能使用全限定类名
+
+传递POJO包装对象
+开发中使用POJO传递查询条件，查询条件是综合的查询条件，不仅包括用户查询条件，还包括其他的查询条件(比如将用户购买商品信息也作为查询条件)，这是可以声依永包装对象输入参数
+
+```
+package com.paulniu.domain;
+
+import java.io.Serializable;
+
+public class QueryVo implements Serializable {
+
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+}
+```
+
+接口类
+```
+ //根据QueryVo条件查询
+    List<User> findByVo(QueryVo queryVo);
+```
+
+映射
+```
+<select id="findByVo" parameterType="com.paulniu.domain.QueryVo" resultType="com.paulniu.domain.User" >
+        select * from user where username like #{user.username}
+    </select>
+```
+
+测试类
+```
+ /**
+     * 使用pojo封装类
+     */
+    public static void findByVo(){
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession();
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        QueryVo vo = new QueryVo();
+        User user = new User();
+        user.setUsername("%小%");
+        vo.setUser(user);
+        List<User> users = userDao.findByVo(vo);
+        for (User uu:users){
+            System.out.println(uu.toString());
+        }
+        session.close();
+    }
+```
+
+![POJO封装运行结果](/assets/JavaEE/mybatis-07.png)
