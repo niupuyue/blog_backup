@@ -482,3 +482,100 @@ public class QueryVo implements Serializable {
 ```
 
 ![POJO封装运行结果](/assets/JavaEE/mybatis-07.png)
+
+### SqlMapConfig.xml配置文件
+配置文件的额内容和顺序
+```
+-properties(属性)
+    --property
+-settings(全局配置参数)
+    --setting
+-typeAliases(类型别名)
+    --typeAliase
+    --package
+-typeHandlers(类型处理器)
+-objectFactory(对象工厂)
+-plugins(插件)
+-environments(环境集合属性对象)
+    --environment(环境子属性对象)
+        ---transactionManager(事务管理)
+        ---dataSource(数据源)
+-mappers(映射器)
+    --mapper
+    --package                    
+```
+
+properties(属性)
+```
+<properties>
+    <property name="jdbc.driver" value="com.mysql.jdbc.Driver" />
+    <property name="jdbc.url" value="jdbc:mysql://localhost:3306/eesy" />
+    <property name="jdbc.username" value="root" />
+    <property name="jdbc.password" value="123456">
+</properties>
+```
+
+> 除了上面这样的方式之外我们可以定义db.properties文件
+
+我们使用DataSource标签完成数据库的配置工作
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- mybatis主配置文件 -->
+<configuration>
+    <!-- 配置环境 -->
+    <environments default="mysql">
+        <environment id="mysql">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <!-- 配置连接基本信息 -->
+                <property name="driver" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis_db?characterEncoding=utf8" />
+                <property name="username" value="root" />
+                <property name="password" value="root" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 指定映射配置文件位置，映射配置文件指的是每个独立到的配置文件 -->
+    <mappers>
+        <mapper resource="com/paulniu/mybatis_01/IUserDao.xml" />
+    </mappers>
+</configuration>
+```
+
+## Mybatis连接池和事务
+在我们之前的代码中，我们会发现如果我们执行插入操作需要调用SqlSession.commit()方法，其实这个就是将事务操作。
+
+### 连接池
+Mybatis中连接池分为三类，分别是UNPOOLED，POLLED，JNDI
+配置操作如下
+```
+<dataSource type="POOLED">
+                <!-- 配置连接基本信息 -->
+                <property name="driver" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis_db?characterEncoding=utf8" />
+                <property name="username" value="root" />
+                <property name="password" value="root" />
+            </dataSource>
+```
+
+1. UNPOOLED:表示Mybatis会创建UnpooledDataSource实例
+2. POOLED:表示Mybatis会创建PooledDataSource实例
+3. JNDI:表示Mybatis会从JNDI服务上查找DataSource实例，然后返回使用
+
+这三种数据源中我们一般采用POOLED数据源(就是我们所说的连接池技术)
+
+Mybatis是通过工厂模式来创建数据源DataSource对象的，Mybatis定义了抽象的工厂接口:DataSourceFactory,通过getDataSource()方法返回数据源DataSource。在创建DataSource实例后，会将其放在Configuration对象的Environment对象中，供以后使用。
+
+### 事务控制
+在JDBC中农我们可以通过手动方式将事务的提交改为手动方式，通过setAutoCommit()方法就可以调整，因为Mybatis是对JDBC的封装，所以Mybatis框架的事务控制方式本身就是JDBC的setAutoCommit()方法来设置事务提交方式的。
+
+其实我们在执行创建，更新，删除等Sql操作必须使用sqlSession.commit()提交事务，因为在连接池中获取连接，都会调用connection.setAutoCommit(false)方法，这样我们必须调用sqlSession.commit()方法。我们可以不进行手动提交，一样实现更新，删除，创建等操作
+![自定提交事务设置](/assets/JavaEE/mybatis-08.png)
+
+### Mybatis的动态Sql语句
+我们根据实体类的不同取值，使用不同的SQL语句进行查询，例如在id如果不为空的情况下根据id查询， 如果username不为空还要加上用户名作为条件
+
