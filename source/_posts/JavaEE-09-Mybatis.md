@@ -6,6 +6,9 @@ tags:
 ---
 
 MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需要关注sql语句本身，不需要花费精力去处理加载驱动，创建连接，创建statement等繁杂的过程。
+
+<!--more-->
+
 Mybatis通过xml或者注解的方式将要执行的各种statement配置起来，并通过java对象和statement中sql的动态参数进行映射生成最终执行的sql语句，最后由Mybatis框架执行sql并将结果映射为java对象并返回
 采用ORM思想解决了实体和数据库映射问题，对JDBC进行封装，屏蔽了JDBC API底层访问细节，是我们不用与JDBC API打交道，就可以完成对数据库持久化操作
 
