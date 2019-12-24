@@ -581,7 +581,340 @@ Mybatis是通过工厂模式来创建数据源DataSource对象的，Mybatis定�
 
 ### Mybatis的动态Sql语句
 我们根据实体类的不同取值，使用不同的SQL语句进行查询，例如在id如果不为空的情况下根据id查询， 如果username不为空还要加上用户名作为条件
+```
+List<User> findByUser(User user);
+```
+```
+<select id="findByUser" resultType="com.paulniu.domain.User" parameterType="com.paulniu.domain.User">
+        select * from user where 1 = 1
+        <if test="username!=null and username != ' '.toString()">
+            and username like #{username}
+        </if>
+        <if test="address != null">
+            and address like #{address}
+        </if>
+    </select>
+```
+测试代码：
+```
+    public static void findByUser() {
+        User user = new User();
+        user.setUsername("%小%");
+        user.setAddress("%门头沟%");
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession(true);
+        IUserDao dao = session.getMapper(IUserDao.class);
+        List<User> users = dao.findByUser(user);
+        for (User uu : users) {
+            System.out.println(uu.toString());
+        }
+        session.close();
+    }
+```
+运行结果：
+![if语句动态查询结果](/assets/JavaEE/mybatis-09.png)
 
+使用foreach标签
+传入多个id查询用户信息，使用如下两个sql实现
+```
+select * from users where username like '%张%' and (id = 10 or id =89 or id = 16)
+select * from users where username like '%张%' and id in (10,89,16)
+```
+这样我们在进行范围查询时，就将集合中的值作为参数动态添加进来
+
+我们可以使用QueryVo加入一个List集合用于封装参数
+创建一个新的类QueryVo2
+```
+public class QueryVo2 {
+
+    private List<Integer> ids;
+
+    public List<Integer> getIds() {
+        return ids;
+    }
+
+    public void setIds(List<Integer> ids) {
+        this.ids = ids;
+    }
+}
+```
+添加接口
+```
+List<User> findInIds(QueryVo2 queryVo);
+```
+修改IUserDao.xml文件
+```
+<select id="findInIds" resultType="com.paulniu.domain.User" parameterType="com.paulniu.domain.QueryVo2">
+        <include refid="defaultUser" />
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                <foreach collection="ids" open="and id in ( " close=")" item="uid"  separator=",">
+                    #{uid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+```
+此处为了避免重复写太多的代码，我们写了一个include标签，标签的内容如下
+```
+<sql id="defaultUser">
+        select * from user
+    </sql>
+```
+测试代码：
+```
+    public static void findInIds() {
+        QueryVo2 queryVo2 = new QueryVo2();
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(40);
+        ids.add(42);
+        ids.add(47);
+        queryVo2.setIds(ids);
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession(true);
+        IUserDao userDao = session.getMapper(IUserDao.class);
+        List<User> users = userDao.findInIds(queryVo2);
+        for (User user : users) {
+            System.out.println(user.toString());
+        }
+    }
+```
+测试结果：
+![测试结果](/assets/JavaEE/mybatis-10.png)
+
+#### 多表查询一对多
+我们使用的例子比较简单，就是用户和账户的模型来分析MyBatis中多表关系，用户为User表，账户为Account表，一个用户可以拥有多个账户。我们将查询所有账户信息，关联查询下单用户信息
+
+> 注意，因为一个账户信息只能提供给某个用户使用，所以从查询账户信息出发关联查询用户信息是一对一查询，如果从用户信息出发查询用户下的账户信息为一对多查询
+
+先编写Account.class类
+```
+public class Account implements Serializable {
+
+    private Integer id;
+    private Integer uid;
+    private Double money;
+
+    public Account(Integer id, Integer uid, Double money) {
+        this.id = id;
+        this.uid = uid;
+        this.money = money;
+    }
+
+    public Account() {
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Double getMoney() {
+        return money;
+    }
+
+    public void setMoney(Double money) {
+        this.money = money;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", uid=" + uid +
+                ", money=" + money +
+                '}';
+    }
+}
+```
+正常情况下Sql语句应该是这样的
+```
+select account.*,user.name,user.address from account,user where account.uid = user.id;
+```
+查询结果如下所示
+![多表查询](/assets/JavaEE/mybatis-11.png)
+
+为了能够多表查询，我们创建一个新的类AccountUser类
+```
+public class AccountUser extends Account implements Serializable {
+
+    private String username;
+    private String address;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+}
+```
+新建一个接口IAccountUserDao
+```
+public interface IAccountUserDao {
+    List<AccountUser> findAll();
+
+}
+```
+
+创建IAccountUserDao.xml文件
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paulniu.mybatis_01.IAccountUserDao">
+    <select id="findAll" resultType="com.paulniu.domain.AccountUser">
+        select account.*,user.username,user.address from account,user where account.uid = user.id
+    </select>
+</mapper>
+```
+
+测试类
+```
+public static void findAll2(){
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory factory = builder.build(is);
+        SqlSession session = factory.openSession(true);
+        IAccountUserDao dao = session.getMapper(IAccountUserDao.class);
+        List<AccountUser> accountUsers = dao.findAll();
+        for (AccountUser user : accountUsers){
+            System.out.println(user.toString());
+        }
+    }
+```
+
+SQLMapConfig.xml文件中添加mapper标签
+```
+<!-- 指定映射配置文件位置，映射配置文件指的是每个独立到的配置文件 -->
+    <mappers>
+        <mapper resource="com/paulniu/mybatis_01/IUserDao.xml" />
+        <mapper resource="com/paulniu/mybatis_01/IAccountUserDao.xml" />
+    </mappers>
+```
+
+运行结果
+![运行结果](/assets/JavaEE/mybatis-12.png)
+
+> 作为21世纪祖国的花朵，我们岂能用这种方法，也太麻烦了，毕竟每次当我们执行一个新的多表查询的时候，都要创建一个新类，这样未免有些麻烦，所以我们还有另一种方法
+
+我们需要做的就是在刚才创建的Account类中添加一个对象，叫做User，如果所示
+```
+public class Account implements Serializable {
+
+    private Integer id;
+    private Integer uid;
+    private Double money;
+
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Account(Integer id, Integer uid, Double money) {
+        this.id = id;
+        this.uid = uid;
+        this.money = money;
+    }
+
+    public Account() {
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Double getMoney() {
+        return money;
+    }
+
+    public void setMoney(Double money) {
+        this.money = money;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", uid=" + uid +
+                ", money=" + money +
+                '}';
+    }
+}
+```
+
+在IAccountUserDao接口文件中添加如下代码
+```
+    List<AccountUser> findAll2();
+```
+在IAccountUserDao.xml文件中添加如下
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paulniu.mybatis_01.IAccountUserDao">
+    <!--简历对应关系-->
+    <resultMap id="accountMap" type="com.paulniu.domain.Account">
+        <id column="aid" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="money" property="money"/>   <!-- 它是用于指定从表方的引用实体属性的 -->
+        <association property="user" javaType="com.paulniu.domain.User">
+            <id column="id" property="id"/>
+            <result column="username" property="username"/>
+            <result column="sex" property="sex"/>
+            <result column="birthday" property="birthday"/>
+            <result column="address" property="address"/>
+        </association>
+    </resultMap>
+    <select id="findAll" resultType="com.paulniu.domain.AccountUser">
+        select account.*,user.username,user.address from account,user where account.uid = user.id
+    </select>
+
+    <select id="findAll2" resultType="com.paulniu.domain.Account">
+        select u.*,a.id as aid,a.uid,a.money from account a,user u where a.uid =u.id
+    </select>
+</mapper>
+```
 
 ## Mybatis延迟加载策略
 
@@ -589,9 +922,16 @@ Mybatis是通过工厂模式来创建数据源DataSource对象的，Mybatis定�
 > 好处：先从表单查询，需要时再关联表去关联查询，大大提高数据库性能，因为查询表单需要比关联查询多张标速度款
 > 坏处：因为只有当需要用到数据时才会进行数据库查询，这样在大量数据批量次查询时，因为查询工作也会消耗时间，所以可能造成用户等待时间变长
 
+我们可以做一个例子：查询账户信息，并且关联查询用户信息。
+
 
 ## Mybatis缓存
 像大多数持久层框架一样，Mybatis也提供了缓存策略，通过缓存策略来减少数据库查询次数，从而提高性能
 Mybatis中缓存分为一级缓存，二级缓存
 
 > 以及缓存是SqlSession级别的缓存，只要SqlSession没有flush或者close，他就一直存在
+
+一级缓存是SqlSession范围的缓存，当调用SqlSession的修改，添加，删除，commit，close等方法时，就会清空一级缓存
+
+二级缓存是mapper映射级别的缓存，多个SqlSession去操作同一个Mapper映射的sql语句，多个SqlSession可以共用二级缓存，二级缓存是跨SqlSession的
+
