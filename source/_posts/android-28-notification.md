@@ -18,7 +18,7 @@ Notification，中文名翻译为通知，每个 app 可以自定义通知的样
 一般来说，如果我们自己的 app 想发送一条新的 Notification，可以参照以下代码
 
 ```
-xNotificationCompat.Builder mBuilder =
+NotificationCompat.Builder mBuilder =
        new NotificationCompat.Builder(this)
        .setSmallIcon(R.drawable.notification_icon)
        .setWhen(System.currentTimeMillis())
