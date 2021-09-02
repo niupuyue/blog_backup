@@ -13,7 +13,7 @@ EventBus就是能够简化组件之间通信，让我们的代码书写变得更
 # 关于EventBus
 ## 要素
 1. Event 事件，可以是任意类型
-2. Subscribe() 事件订阅者，或者说是事件接受者。在EventBus3之前，使用的时候，我们必须定义以onEvent开头的那几个方法，onEvent,onEventMainThread,onEventBackgroundThread和onEventAsync。但是在EventBus3之后我们处理事件的方法名可以随意取，只要加上响应的注解@subscribe()即可，并且指定了线程模型是POSTING
+2. Subscribe() 事件订阅者，或者说是事件接受者。在EventBus3之前，使用的时候，我们必须定义以onEvent开头的那几个方法，**onEvent**,**onEventMainThread**,**onEventBackgroundThread**和**onEventAsync**。但是在EventBus3之后我们处理事件的方法名可以随意取，只要加上响应的注解@subscribe()即可，并且指定了线程模型是POSTING
 3. Publisher 事件发布者，就是事件是由他发布的，他通知别人去做什么事情。我们可以在任意地方发布事件，一般情况下，使用EventBus.getDefault()就可以得到一个EventBus对象，然后调用post(object)方法即可
 ## 四种线程模型
 1. POSTING（默认） 表示事件处理函数的线程跟发布事件的线程是同一个线程(不管之前发布的消息的事主线程还是子线程，都使用发布事件对象所处的线程)
@@ -197,5 +197,187 @@ public class SecondActivity extends AppCompatActivity{
 }
 ```
 之后就可以实现了。
+
+2021年06月21日17:27:37 补充
+除了会用，还要明白各种各样的原理，至少知道为什么要这么用。
+这几天同事问了我一句话：“为什么我们页面之间数据传递的时候，大部分是使用回调的方式，为什么不直接使用EventBus？”
+当时他这么一说，我还有点蒙，毕竟从我开始写代码就一直使用回调的方式实现数据传递，可是为什么不适用EventBus 我还真没有想过，有不懂，看源码
+
+首先这张图应该很多人都看过，我在网上随便找的
+
+![EventBus概述图片](/assets/event/overview.png)
+
+下面的是关于regist和post的流程
+
+![EventBus注册流程图](/assets/event/regist.png)
+
+
+
+#### 观察者注册
+
+在观察者注册时，我们通过源码可以发现，使用双重锁声明了一个Event对象(唯一一个)
+
+```java
+/** Convenience singleton for apps using a process-wide EventBus instance. */
+    public static EventBus getDefault() {
+        EventBus instance = defaultInstance;
+        if (instance == null) {
+            synchronized (EventBus.class) {
+                instance = EventBus.defaultInstance;
+                if (instance == null) {
+                    instance = EventBus.defaultInstance = new EventBus();
+                }
+            }
+        }
+        return instance;
+    }
+```
+
+通过regist注册观察者
+
+```java
+    /**
+     * Registers the given subscriber to receive events. Subscribers must call {@link #unregister(Object)} once they
+     * are no longer interested in receiving events.
+     * <p/>
+     * Subscribers have event handling methods that must be annotated by {@link Subscribe}.
+     * The {@link Subscribe} annotation also allows configuration like {@link
+     * ThreadMode} and priority.
+     */
+    public void register(Object subscriber) {
+        Class<?> subscriberClass = subscriber.getClass();
+        List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
+        synchronized (this) {
+            for (SubscriberMethod subscriberMethod : subscriberMethods) {
+                subscribe(subscriber, subscriberMethod);
+            }
+        }
+    }
+```
+
+在这个方法中，我们调用register方法时，传递的一般都是当前对象，也就是说，subscriber是当前类的持有对象。通过**subscriber.getClass()**方法拿到的是类的反射对象，然后通过**subscriberMethodFinder.findSubscriberMethods()**方法找到该类中所有的通过注解**@Subscribe**来实现的方法。然后在通过**synchronized**来完成数据的执行，执行的时候也是通过遍历实现的
+
+其中**subscribe()**方法就是具体调用方法的执行
+
+```java
+private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
+    ...
+    Class<?> eventType = subscriberMethod.eventType;
+    Subscription newSubscription = new Subscription(subscriber, subscriberMethod);
+    ...
+}
+```
+
+
+
+#### 发送消息
+
+消息发送通过Post方法
+
+```java
+    /** Posts the given event to the event bus. */
+    public void post(Object event) {
+        PostingThreadState postingState = currentPostingThreadState.get();
+        List<Object> eventQueue = postingState.eventQueue;
+        eventQueue.add(event);
+
+        if (!postingState.isPosting) {
+            postingState.isMainThread = isMainThread();
+            postingState.isPosting = true;
+            if (postingState.canceled) {
+                throw new EventBusException("Internal error. Abort state was not reset");
+            }
+            try {
+                while (!eventQueue.isEmpty()) {
+                    postSingleEvent(eventQueue.remove(0), postingState);
+                }
+            } finally {
+                postingState.isPosting = false;
+                postingState.isMainThread = false;
+            }
+        }
+    }
+```
+
+
+
+在这个方法里，**currentPostingThreadState**是一个ThreadLocal对象，**PostingThreadState**是一个静态类，可以帮助我们更快的实现设置数据的操作，其中就包括了我们需要使用的**eventQueue**，这个**eventQueue**是一个Object类型的ArrayList集合，但是它的操作是一个队列(后面我们会说到)。
+
+在这个方法中，我们会循环执行**postSingleEvent()**方法来发送单个事件。
+
+```java
+   private void postSingleEvent(Object event, PostingThreadState postingState) throws Error {
+        Class<?> eventClass = event.getClass(); //重点在这里，按消息类型发送到相应的对象
+        boolean subscriptionFound = false;
+        if (eventInheritance) {
+            List<Class<?>> eventTypes = lookupAllEventTypes(eventClass);
+            int countTypes = eventTypes.size();
+            for (int h = 0; h < countTypes; h++) {
+                Class<?> clazz = eventTypes.get(h);
+                subscriptionFound |= postSingleEventForEventType(event, postingState, clazz);
+            }
+        } else {
+            subscriptionFound = postSingleEventForEventType(event, postingState, eventClass);
+        }
+        if (!subscriptionFound) {
+            if (logNoSubscriberMessages) {
+                logger.log(Level.FINE, "No subscribers registered for event " + eventClass);
+            }
+            if (sendNoSubscriberEvent && eventClass != NoSubscriberEvent.class &&
+                    eventClass != SubscriberExceptionEvent.class) {
+                post(new NoSubscriberEvent(this, event));
+            }
+        }
+    }
+```
+
+通过反射的invoke()方法唤起观察者的监听方法
+
+```java
+void invokeSubscriber(Subscription subscription, Object event) {
+    try {
+        subscription.subscriberMethod.method.invoke(subscription.subscriber, event);//最后用反射唤起对象的监听方法
+    } catch (InvocationTargetException e) {
+        handleSubscriberException(subscription, event, e.getCause());
+    } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Unexpected exception", e);
+    }
+}	
+```
+
+
+
+#### 注销
+
+```java
+public synchronized void unregister(Object subscriber) {
+    List<Class<?>> subscribedTypes = typesBySubscriber.get(subscriber);
+    if (subscribedTypes != null) {
+        for (Class<?> eventType : subscribedTypes) {
+            unsubscribeByEventType(subscriber, eventType);
+        }
+        typesBySubscriber.remove(subscriber);
+    } else {
+        logger.log(Level.WARNING, "Subscriber to unregister was not registered before: " + subscriber.getClass());
+    }
+}	
+```
+
+
+
+> 通过上面的源码，我们发现，EventBus是通过反射，注解和观察者模式实现的消息通知机制。这样的机制方便我们可以对一些操作进行快速的反应。
+>
+> 但是同样它存在这样的问题
+>
+> - 使用注解的方式监听事件消息，在实际项目中debug调试并不是非常的方便
+> - 关键代码大量使用反射，这就导致效率较低
+
+
+
+这样也能回答同事的问题了，为什么不能大量使用EventBus，特别是当需要传递数据类型更加复杂的时候，使用EventBus是非常耗时的。
+
+
+
+
 # 总结
 这里只是简单的实现EventBus的简单实现，所以暂时先说到这里

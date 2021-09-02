@@ -2,7 +2,7 @@
 title: 重拾android路(三十一) Kotlin学习笔记
 date: 2019-07-25 11:49:11
 tags:
-  - Kotlin
+  - kotlin
   - android
 ---
 
@@ -646,6 +646,29 @@ fun main(args:Array<String>){
   }
 }
 ```
+除了上面的方式之外，我们还可以通过增强for循环遍历数组或者集合
+```
+val items = listOf("hello","world","my name","paulniu")
+items.forEach{ item -> 
+  println(item)  
+}
+打印结果就是
+"hello","world","my name","paulniu"
+```
+如果我们想获取每个item的下标，可以通过带index的for循环，来实现
+```
+val items = listOf("hello","world","my name","paulniu")
+items.forEachIndex{ index,item ->
+  println("index="+index+";item=" +item)
+}
+```
+> 当我们想要输出字符串时，可以通过**${}**的方式实现，例如上面的例子，我们可以这样写
+```
+val items = listOf("hello","world","my name","paulniu")
+items.forEachIndex{ index,item -> 
+  println("index=${index};item=${item}")
+}
+```
 
 ## while和do...while循环
 while循环是最基本的循环
@@ -990,9 +1013,9 @@ fun main(args: Array<String>) {
 类的修饰符包括两个
 1. classModifier:类属性修饰符，标示类本身特性
 
-| 修饰符 | 含义
-|!-----! |!-----! |
-|abstract | 抽象类 |
+|修饰符	| 含义  |
+|:----|:-----|
+|abstract	 |  抽象类   |
 |final | 类不可继承，默认属性 |
 |enum |枚举类 |
 |open | 类可继承，类默认是final的 |
@@ -1001,7 +1024,7 @@ fun main(args: Array<String>) {
 2. accessModifier：访问权限修饰符
 
 | 修饰符 | 含义 |
-|!----! | !-----! |
+|:----|:-----|
 |private | 仅在同一个文件中可见 |
 |protected | 同一个文件中或子类可见 |
 | public | 所有调用的地方都可见 |

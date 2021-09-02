@@ -2,8 +2,7 @@
 title: 重拾Android路(五) RxJava和RxAndroid
 date: 2016-03-23 16:57:14
 tags:
-  - Android
-  - rxjava
+  - android
 ---
 
 现在RxJava和RxAndroid越来越火爆，自己在业余时间也学习了一下，感觉确实很好用，之前 为了完成页面刷新，数据请求，组件信息传递的时候，要使用handler，真的是逻辑思路很强，稍微不注意，就各种错误一大堆。这下有了RxJava和RxAndroid，真的爽。

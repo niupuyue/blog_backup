@@ -1,5 +1,5 @@
 ---
-title: android奇技淫巧 23 S语音播放/录制模块封装
+title: android奇技淫巧 23 语音播放/录制模块封装
 date: 2020-03-11 10:38:10
 tags:
   - android

@@ -2,7 +2,6 @@
 title: 第一个Swift项目记录
 date: 2018-05-12 16:13:15
 tags:
-  - IOS
   - swift
 ---
 
